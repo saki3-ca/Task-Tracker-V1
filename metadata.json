@@ -1,0 +1,6 @@
+{
+  "name": "ACNABIN Task Tracker",
+  "description": "Task management and to-do tracking system for ACNABIN Chartered Accountants, audit, fixes, and multi-platform deployment preparation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

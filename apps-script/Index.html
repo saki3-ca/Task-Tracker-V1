@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACNABIN Management Task Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+    /* ===== Geometric Balance Theme ===== */
+    :root {
+        --cream: #f0f2f5;
+        --maroon: #4f46e5;
+        --maroon-dark: #4338ca;
+        --maroon-light: #eef2ff;
+        --teal: #0d9488;
+        --teal-light: #f0fdfa;
+        --navy: #1e293b;
+        --ink: #1e293b;
+        --ink-soft: #64748b;
+        --line: #e2e8f0;
+        --white: #ffffff;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-700: #334155;
+        --slate-800: #1e293b;
+        --slate-900: #0f172a;
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --primary-light: #eef2ff;
+        --emerald: #10b981;
+        --amber: #f59e0b;
+        --blue: #3b82f6;
+        --rose: #f43f5e;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+        background: var(--cream);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+    }
+    .hidden { display: none !important; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px 24px 60px;
+    }
+    .top-row {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        padding: 16px 20px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    .brand { display: flex; align-items: center; align-self: center; gap: 12px; }
+    .logo-circle {
+        width: 38px; height: 38px; border-radius: 6px; background: var(--primary); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Inter', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: -0.5px;
+        flex-shrink: 0; box-shadow: 0 1px 2px rgba(79, 70, 229, 0.3);
+    }
+    .brand-name { font-weight: 800; font-size: 15px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--slate-800); }
+    .brand-sub { font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--slate-400); }
+    .date-line { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--slate-400); margin-top: 4px; }
+
+    .who-box { text-align: right; align-self: center; }
+    .page-heading { text-align: center; margin-top: 0; }
+    .who-name { font-weight: 700; font-size: 13px; color: var(--slate-800); }
+    .who-client { font-size: 11px; color: var(--slate-500); margin-top: 2px; }
+    .who-role {
+        display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+        padding: 2px 8px; border-radius: 4px; background: var(--primary); color: #fff; text-transform: uppercase;
+    }
+    .who-role.manager { background: var(--slate-800); }
+    .who-role.admin { background: var(--teal); }
+    .who-role.student { background: var(--slate-500); }
+
+    h1.masthead {
+        font-family: 'Inter', sans-serif; font-weight: 800;
+        font-size: clamp(22px, 3.5vw, 28px); color: var(--slate-800);
+        letter-spacing: -0.02em; text-transform: uppercase; margin: 0 0 2px; line-height: 1.1;
+    }
+    .masthead-sub {
+        text-align: center; font-family: 'Inter', sans-serif; font-style: normal;
+        font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+        color: var(--primary); margin-bottom: 0;
+    }
+
+    .btn-primary {
+        font-family: 'Inter', sans-serif; font-weight: 700; font-size: 11.5px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        padding: 9px 18px; border-radius: 6px; border: none;
+        background: var(--primary); color: #fff; cursor: pointer;
+        box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
+        transition: background 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 2px 4px rgba(79, 70, 229, 0.35); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    .btn-secondary {
+        font-family: 'Inter', sans-serif; font-weight: 600; font-size: 12px;
+        padding: 9px 16px; border-radius: 6px; border: 1px solid var(--line);
+        background: #ffffff; color: var(--slate-700); cursor: pointer; transition: all 0.15s;
+    }
+    .btn-secondary:hover { background: #f8fafc; border-color: var(--slate-300); color: #0f172a; }
+    .btn-teal {
+        font-family: 'Inter', sans-serif; font-weight: 700; font-size: 11.5px;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        padding: 9px 18px; border-radius: 6px; border: none;
+        background: var(--teal); color: #fff; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-teal:hover { background: #0f766e; }
+    .btn-link {
+        background: none; border: none; color: var(--primary); font-weight: 600;
+        font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline;
+    }
+    .btn-link:hover { color: var(--primary-hover); }
+    .btn-block { width: 100%; }
+    .btn-sm { padding: 6px 12px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .auth-shell {
+        min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        padding: 40px 16px; background: #f0f2f5;
+    }
+    .auth-card {
+        background: #ffffff; border: 1px solid var(--line); border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+        padding: 36px 32px; width: 100%; max-width: 440px;
+    }
+    .auth-card .logo-circle { margin: 0 auto 12px; }
+    .auth-header { text-align: center; margin-bottom: 24px; }
+    .auth-title {
+        font-family: 'Inter', sans-serif; font-weight: 800; font-size: 20px;
+        letter-spacing: -0.01em; text-transform: uppercase; color: #1e293b; margin: 8px 0 4px;
+    }
+    .auth-subtitle { font-size: 12.5px; color: #64748b; }
+    .auth-switch { text-align: center; margin-top: 18px; font-size: 12px; color: #64748b; }
+    .auth-error {
+        background: #fff1f2; border: 1px solid #fecdd3; color: #be123c;
+        font-size: 12px; font-weight: 500; padding: 10px 12px; border-radius: 6px; margin-bottom: 16px;
+    }
+    .auth-success {
+        background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857;
+        font-size: 12px; font-weight: 500; padding: 10px 12px; border-radius: 6px; margin-bottom: 16px;
+    }
+    .welcome-shell {
+        min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        padding: 40px 16px; text-align: center; background: #f0f2f5;
+    }
+    .welcome-card {
+        background: #ffffff; border: 1px solid var(--line); border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05); padding: 40px 32px; max-width: 480px; width: 100%;
+    }
+    .welcome-tag {
+        font-family: 'Inter', sans-serif; font-style: normal; font-weight: 500;
+        color: #64748b; font-size: 13.5px; margin: 8px 0 28px;
+    }
+    .welcome-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .welcome-actions .btn-primary, .welcome-actions .btn-secondary { min-width: 140px; padding: 11px 22px; font-size: 12.5px; }
+
+    .field { margin-bottom: 14px; text-align: left; }
+    .field label {
+        display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.06em; color: #64748b; margin-bottom: 5px;
+    }
+    .field input, .field select, .field textarea {
+        width: 100%; font-family: 'Inter', sans-serif; font-size: 13px; padding: 9px 12px;
+        border-radius: 6px; border: 1px solid var(--line); background: #f8fafc; color: #1e293b;
+        transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+        outline: none; border-color: var(--primary); background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    .field textarea { resize: vertical; }
+    .field-hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .field .suggestions {
+        border: 1px solid var(--line); border-top: none; border-radius: 0 0 6px 6px;
+        background: #ffffff; max-height: 160px; overflow-y: auto;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .field .suggestions div {
+        padding: 8px 12px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid #f1f5f9; color: #334155;
+    }
+    .field .suggestions div:hover { background: #eef2ff; color: var(--primary); }
+    .field .suggestions div:last-child { border-bottom: none; }
+
+    .pills { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+    .pill {
+        border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px;
+        text-align: left; background: #ffffff; flex: 1 1 148px; min-width: 140px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05); position: relative; overflow: hidden;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .pill::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: var(--primary);
+    }
+    .pill:nth-child(1)::before { background: var(--primary); }
+    .pill:nth-child(2)::before { background: var(--amber); }
+    .pill:nth-child(3)::before { background: var(--blue); }
+    .pill:nth-child(4)::before { background: var(--emerald); }
+    .pill:nth-child(5)::before { background: var(--rose); }
+    .pill.teal-border::before { background: var(--teal); }
+    .pill.navy-border::before { background: var(--navy); }
+
+    .pill-label {
+        font-family: 'Inter', sans-serif; font-weight: 700; font-size: 10px;
+        letter-spacing: 0.1em; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px;
+        white-space: nowrap;
+    }
+    .pill-value {
+        font-family: 'Inter', sans-serif; font-weight: 800; font-size: 24px;
+        color: #1e293b; margin-top: 0; letter-spacing: -0.02em;
+    }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab {
+        font-family: 'Inter', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.06em;
+        padding: 8px 16px; border-radius: 6px; border: 1px solid var(--line); background: #ffffff;
+        color: #475569; cursor: pointer; text-transform: uppercase; transition: all 0.15s;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .tab:hover { border-color: var(--slate-300); color: #0f172a; background: #f8fafc; }
+    .tab.active { background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); font-weight: 800; }
+    .tab.admin-tab { border-color: var(--line); color: var(--teal); }
+    .tab.admin-tab.active { background: var(--teal-light); color: var(--teal); border: 1.5px solid var(--teal); }
+
+    .filter-bar {
+        display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap;
+        background: #ffffff; border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+    }
+    .filter-bar input[type=text], .filter-bar select, .filter-bar input[type=date] {
+        font-family: 'Inter', sans-serif; font-size: 12.5px; padding: 7px 11px; border-radius: 6px;
+        border: 1px solid var(--line); background: #f8fafc; color: var(--ink);
+    }
+    .filter-bar input[type=text] { flex: 1 1 200px; min-width: 160px; }
+    .filter-bar label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
+    .filter-bar .btn-secondary { padding: 6px 12px; font-size: 11.5px; }
+
+    .banner {
+        color: var(--slate-800) !important;
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        font-size: 11.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-align: left;
+        padding: 11px 16px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        background: #ffffff !important;
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--primary) !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        display: flex;
+        align-items: center;
+    }
+    #nearBanner {
+        border-left-color: var(--rose) !important;
+    }
+    #teamBanner {
+        border-left-color: var(--teal) !important;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+        border-radius: 6px;
+        margin-bottom: 28px;
+        border: 1px solid var(--line);
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 900px;
+        table-layout: fixed;
+    }
+    thead tr {
+        background: #f8fafc !important;
+    }
+    th {
+        color: #64748b !important;
+        background: #f8fafc !important;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 12px 10px;
+        text-align: center;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--line);
+    }
+    td {
+        font-family: 'Inter', sans-serif;
+        font-size: 12px;
+        color: #334155;
+        padding: 11px 10px;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: center;
+        word-wrap: break-word;
+        white-space: normal;
+        overflow-wrap: break-word;
+        line-height: 1.45;
+        vertical-align: middle;
+        background: #ffffff;
+    }
+    tbody tr:hover td {
+        background: #f8fafc;
+    }
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+    td.particular, td.name, td.remarks, td.comment { text-align: center; }
+    td.particular { font-weight: 600; color: #0f172a; }
+    td.sl { text-align: center; font-weight: 700; color: #94a3b8; }
+    td.empty { text-align: center; color: #94a3b8; padding: 36px 0; font-style: normal; font-weight: 500; }
+    td.overdue-cell { color: var(--rose); font-weight: 700; }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .status-in-progress { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .status-completed { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .status-overdue { background: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; }
+
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .priority-high { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+    .priority-medium { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .priority-low { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+
+    .icon-btn {
+        border: 1px solid var(--line);
+        background: #ffffff;
+        color: #64748b;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        margin: 0 2px;
+        transition: all 0.15s;
+    }
+    .icon-btn:hover { background: var(--primary); border-color: var(--primary); color: #ffffff; }
+    .icon-btn.teal-hover:hover { background: var(--teal); border-color: var(--teal); color: #ffffff; }
+    .icon-btn.danger:hover { background: var(--rose); border-color: var(--rose); color: #ffffff; }
+
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(2px);
+        display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+        background: #ffffff; border-radius: 8px; padding: 24px; width: 100%; max-width: 500px;
+        max-height: 88vh; overflow-y: auto; border: 1px solid var(--line);
+        box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+    }
+    .modal h2 {
+        font-family: 'Inter', sans-serif; font-weight: 800; font-size: 16px;
+        text-transform: uppercase; letter-spacing: 0.04em; color: #1e293b; margin: 0 0 16px;
+        padding-bottom: 10px; border-bottom: 1px solid var(--line);
+    }
+    .modal-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .modal-actions .btn-primary, .modal-actions .btn-secondary { flex: 1; padding: 10px 16px; }
+
+    .comment-block {
+        background: #f8fafc; border-left: 3px solid var(--primary); border-radius: 4px;
+        padding: 8px 12px; font-size: 12px; color: #334155; margin-top: 6px;
+    }
+
+    .toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px;
+        font-size: 12.5px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; justify-content: flex-end; }
+    .nav-link {
+        font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.05em; color: #475569; background: #ffffff; border: 1px solid var(--line);
+        border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: all 0.15s;
+    }
+    .nav-link:hover { background: #f8fafc; border-color: var(--slate-300); color: #0f172a; }
+    .nav-link.danger { color: var(--rose); border-color: #fecdd3; background: #fff1f2; }
+    .nav-link.danger:hover { background: var(--rose); color: #fff; }
+
+    .loading-row { text-align: center; padding: 30px 0; color: #94a3b8; font-size: 12.5px; font-style: normal; font-weight: 500; }
+
+    .admin-settings-section {
+        background: #ffffff; border: 1px solid var(--line); border-radius: 6px; padding: 20px;
+        margin-bottom: 24px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    .admin-settings-section h3 {
+        font-family: 'Inter', sans-serif; font-weight: 800; font-size: 13.5px;
+        text-transform: uppercase; letter-spacing: 0.06em; color: #1e293b; margin: 0 0 14px;
+        padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    }
+    .admin-settings-section .field-group {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
+    }
+    .admin-settings-section .field-group label {
+        font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b;
+    }
+    .admin-settings-section .field-group input { width: 100%; }
+    .admin-settings-section .field-group textarea { width: 100%; height: 80px; }
+    .admin-settings-section .field-group button { align-self: end; }
+    .user-table-wrap { overflow-x: auto; margin-top: 14px; border: 1px solid var(--line); border-radius: 6px; }
+    .user-table-wrap table { min-width: 700px; }
+    .user-table-wrap th { background: #f8fafc; color: #64748b; }
+    .user-table-wrap td { padding: 8px 10px; }
+    .user-table-wrap select { padding: 6px; border-radius: 4px; border: 1px solid var(--line); background: #f8fafc; font-size: 12px; }
+
+    .access-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0;
+    }
+    .access-grid .client-item {
+        display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+        border-radius: 6px; background: #f8fafc; border: 1px solid var(--line);
+        transition: border-color 0.15s;
+    }
+    .access-grid .client-item:hover { border-color: var(--primary); }
+    .access-grid .client-item input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+    .access-grid .client-item label { font-size: 12.5px; cursor: pointer; flex: 1; color: #334155; font-weight: 500; }
+
+    .client-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 14px; margin-bottom: 24px;
+    }
+    .client-card {
+        background: #ffffff; border: 1px solid var(--line); border-radius: 6px;
+        padding: 16px; text-align: center; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        transition: border-color 0.15s;
+    }
+    .client-card:hover { border-color: var(--primary); }
+    .client-card .name { font-weight: 700; font-size: 13.5px; color: #1e293b; }
+    .client-card .job { font-size: 11px; font-weight: 600; color: var(--teal); margin-top: 4px; }
+    .client-card .job .empty { color: #94a3b8; }
+
+    .edit-client-modal .field-group {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .edit-client-modal .field-group .field { margin-bottom: 0; }
+
+    @media (max-width: 640px) {
+        .top-row { grid-template-columns: 1fr; justify-items: center; }
+        .who-box { text-align: center; }
+        .auth-card { padding: 26px 20px; }
+        .tabs { justify-content: center; }
+        .admin-settings-section .field-group { grid-template-columns: 1fr; }
+        .access-grid { grid-template-columns: 1fr; }
+        .edit-client-modal .field-group { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="view-welcome" class="welcome-shell">
+    <div class="welcome-card">
+        <div class="logo-circle" style="margin:0 auto 14px;">AC</div>
+        <h1 class="masthead" style="font-size:clamp(30px,6vw,48px);">ACNABIN</h1>
+        <div class="masthead-sub" style="margin-bottom:2px;">MANAGEMENT TASK TRACKER</div>
+        <div class="welcome-tag">Task and To-Do List Management System</div>
+        <div class="welcome-actions">
+            <button class="btn-primary" onclick="Router.go('login')">Login</button>
+            <button class="btn-secondary" onclick="Router.go('signup')">Sign Up</button>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN -->
+<div id="view-login" class="auth-shell hidden">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-circle">AC</div>
+            <div class="auth-title">Welcome back</div>
+            <div class="auth-subtitle">Log in to ACNABIN Task Tracker</div>
+        </div>
+        <div id="loginError" class="auth-error hidden"></div>
+        <div class="field">
+            <label>EMP / STD ID</label>
+            <input type="text" id="login_empId" placeholder="Enter your STD ID" maxlength="4" inputmode="numeric">
+        </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" id="login_password" placeholder="••••••••">
+        </div>
+        <button class="btn-primary btn-block" id="loginBtn" onclick="Auth.login()">Login</button>
+        <div class="auth-switch">
+            <button class="btn-link" onclick="Router.go('forgot')">Forgot password?</button>
+            &nbsp;·&nbsp;
+            Don't have an account? <button class="btn-link" onclick="Router.go('signup')">Sign up</button>
+            &nbsp;·&nbsp;
+            <button class="btn-link" onclick="Router.go('welcome')">Back</button>
+        </div>
+    </div>
+</div>
+
+<!-- SIGNUP -->
+<div id="view-signup" class="auth-shell hidden">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-circle">AC</div>
+            <div class="auth-title">Create account</div>
+            <div class="auth-subtitle">Register for ACNABIN Task Tracker</div>
+        </div>
+        <div id="signupError" class="auth-error hidden"></div>
+        <div class="field"><label>Full name</label><input type="text" id="signup_name"></div>
+        <div class="field">
+            <label>EMP / STD ID</label>
+            <input type="text" id="signup_empId" placeholder="Enter your STD ID" maxlength="4" inputmode="numeric">
+            <div class="field-hint">Enter 2 to 4 characters (e.g. 230 or 1643)</div>
+        </div>
+        <div class="field"><label>Email</label><input type="email" id="signup_email"></div>
+        <div class="field">
+            <label>Designation</label>
+            <select id="signup_designation" onchange="Signup.onDesignationChange()">
+                <option value="">Select Designation</option>
+                <option value="Student">Student</option>
+                <option value="Senior Assistant Manager">Senior Assistant Manager</option>
+                <option value="Deputy Manager">Deputy Manager</option>
+                <option value="Manager">Manager</option>
+                <option value="Assistant Director">Assistant Director</option>
+                <option value="Deputy Director">Deputy Director</option>
+                <option value="Director">Director</option>
+                <option value="Partner">Partner</option>
+            </select>
+        </div>
+        <div class="field" id="clientField">
+            <label>Client</label>
+            <input type="text" id="signup_client" placeholder="Start typing client name..." autocomplete="off">
+            <div id="clientSuggestions" class="suggestions hidden"></div>
+            <div class="field-hint" id="clientHint">Students must select a client. For others, this is optional.</div>
+        </div>
+        <div class="field"><label>Password</label><input type="password" id="signup_password"></div>
+        <div class="field"><label>Confirm password</label><input type="password" id="signup_confirm"></div>
+        <button class="btn-primary btn-block" id="signupBtn" onclick="Auth.signup()">Create account</button>
+        <div class="auth-switch">
+            Already have an account? <button class="btn-link" onclick="Router.go('login')">Log in</button>
+            &nbsp;·&nbsp;
+            <button class="btn-link" onclick="Router.go('welcome')">Back</button>
+        </div>
+    </div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div id="view-forgot" class="auth-shell hidden">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-circle">AC</div>
+            <div class="auth-title">Reset password</div>
+            <div class="auth-subtitle">Enter your registered email — we'll send a reset link</div>
+        </div>
+        <div id="forgotMessage" class="hidden"></div>
+        <div class="field"><label>Email</label><input type="email" id="forgot_email"></div>
+        <button class="btn-primary btn-block" id="forgotBtn" onclick="Auth.requestReset()">Send reset link</button>
+        <div class="auth-switch">
+            <button class="btn-link" onclick="Router.go('login')">Back to login</button>
+        </div>
+    </div>
+</div>
+
+<!-- RESET PASSWORD -->
+<div id="view-reset" class="auth-shell hidden">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-circle">AC</div>
+            <div class="auth-title">Choose new password</div>
+            <div class="auth-subtitle">This link is valid for a limited time and can be used once</div>
+        </div>
+        <div id="resetError" class="auth-error hidden"></div>
+        <div class="field"><label>New password</label><input type="password" id="reset_password"></div>
+        <div class="field"><label>Confirm new password</label><input type="password" id="reset_confirm"></div>
+        <button class="btn-primary btn-block" id="resetBtn" onclick="Auth.submitReset()">Update password</button>
+        <div class="auth-switch">
+            <button class="btn-link" onclick="Router.go('login')">Back to login</button>
+        </div>
+    </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="view-app" class="wrap hidden">
+    <div class="top-row">
+        <div class="brand">
+            <div class="logo-circle">AC</div>
+            <div>
+                <div class="brand-name">ACNABIN</div>
+                <div class="brand-sub">Chartered Accountants</div>
+            </div>
+        </div>
+        <div class="page-heading">
+            <h1 class="masthead" id="pageTitle">MY TASKS</h1>
+            <div class="masthead-sub" id="pageSubtitle">Task and To-Do List</div>
+        </div>
+        <div class="who-box">
+            <div class="who-name" id="whoName">—</div>
+            <div class="who-client" id="whoClient"></div>
+            <span class="who-role" id="whoRole">USER</span>
+            <div class="date-line" id="dateLine"></div>
+            <div class="nav-links">
+                <button class="nav-link" id="addTaskBtn" onclick="App.openAddTaskModal()">+ Add Task</button>
+                <button class="nav-link danger" id="logoutBtn" onclick="Auth.logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs hidden" id="managerTabs">
+        <button class="tab active" data-tab="own" onclick="App.switchTab('own')">My Tasks</button>
+        <button class="tab" data-tab="team" onclick="App.switchTab('team')">Team</button>
+        <button class="tab" data-tab="clients" onclick="App.switchTab('clients')">Clients</button>
+        <button class="tab admin-tab hidden" id="adminTabBtn" data-tab="admin" onclick="App.switchTab('admin')">Admin Panel</button>
+    </div>
+
+    <!-- OWN PANE -->
+    <div id="pane-own">
+        <div class="pills">
+            <div class="pill"><div class="pill-label">TOTAL</div><div class="pill-value" id="own_total">00</div></div>
+            <div class="pill"><div class="pill-label">PENDING</div><div class="pill-value" id="own_pending">00</div></div>
+            <div class="pill"><div class="pill-label">IN PROGRESS</div><div class="pill-value" id="own_progress">00</div></div>
+            <div class="pill"><div class="pill-label">COMPLETED</div><div class="pill-value" id="own_completed">00</div></div>
+            <div class="pill"><div class="pill-label">OVERDUE</div><div class="pill-value" id="own_overdue">00</div></div>
+        </div>
+        <div class="banner" style="background:var(--teal);" id="ownBanner">MY TASKS</div>
+        <div class="table-wrap">
+            <table id="ownTable">
+                <thead>
+                    <tr style="background:var(--maroon);">
+                        <th style="width:36px;">SL</th>
+                        <th id="th_own_particular">Particulars</th>
+                        <th id="th_own_addedby" style="width:10%;">Added By</th>
+                        <th style="width:8%;">Priority</th>
+                        <th style="width:10%;">Deadline</th>
+                        <th style="width:11%;">Status</th>
+                        <th id="th_own_remarks" style="width:12%;">Remarks</th>
+                        <th id="th_own_comment" style="width:12%;">Manager Comment</th>
+                        <th style="width:80px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody><tr><td colspan="9" class="loading-row">Loading…</td></tr></tbody>
+            </table>
+        </div>
+        <div class="banner" style="background:var(--maroon);" id="nearBanner">NEAR DEADLINE TASKS</div>
+        <div class="table-wrap">
+            <table id="nearDeadlineTable">
+                <thead>
+                    <tr style="background:var(--teal);">
+                        <th style="width:36px;">SL</th>
+                        <th>Particulars</th>
+                        <th style="width:10%;">Added By</th>
+                        <th style="width:8%;">Priority</th>
+                        <th style="width:10%;">Deadline</th>
+                        <th style="width:11%;">Status</th>
+                        <th style="width:12%;">Remarks</th>
+                        <th style="width:12%;">Manager Comment</th>
+                        <th style="width:80px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody><tr><td colspan="9" class="loading-row">Loading…</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TEAM PANE -->
+    <div id="pane-team" class="hidden">
+        <div class="filter-bar">
+            <label>Team Member</label>
+            <select id="team_member" onchange="App.loadTeamTasks()">
+                <option value="">All team members</option>
+            </select>
+            <label>Client</label>
+            <select id="team_client" onchange="App.loadTeamTasks()">
+                <option value="">All Clients</option>
+            </select>
+            <label>Status</label>
+            <select id="team_status" onchange="App.loadTeamTasks()">
+                <option value="">All</option><option>Pending</option><option>In Progress</option><option>Completed</option>
+            </select>
+            <label><input type="checkbox" id="team_overdue" onchange="App.loadTeamTasks()"> Overdue</label>
+            <button class="btn-primary btn-sm" onclick="App.openAddTaskModal('team')">Assign Task</button>
+        </div>
+        <div class="pills">
+            <div class="pill teal-border"><div class="pill-label">TOTAL</div><div class="pill-value" id="team_total">00</div></div>
+            <div class="pill teal-border"><div class="pill-label">PENDING</div><div class="pill-value" id="team_pending">00</div></div>
+            <div class="pill teal-border"><div class="pill-label">IN PROGRESS</div><div class="pill-value" id="team_progress">00</div></div>
+            <div class="pill teal-border"><div class="pill-label">COMPLETED</div><div class="pill-value" id="team_completed">00</div></div>
+            <div class="pill teal-border"><div class="pill-label">OVERDUE</div><div class="pill-value" id="team_overdue_count">00</div></div>
+        </div>
+        <div class="banner" style="background:var(--maroon);" id="teamBanner">TEAM TASKS</div>
+        <div class="table-wrap">
+            <table id="teamTable">
+                <thead>
+                    <tr style="background:var(--teal);">
+                        <th style="width:36px;">SL</th>
+                        <th>Employee</th>
+                        <th>Client</th>
+                        <th>Particulars</th>
+                        <th style="width:8%;">Priority</th>
+                        <th style="width:10%;">Deadline</th>
+                        <th style="width:11%;">Status</th>
+                        <th>Remarks</th>
+                        <th>Manager Comment</th>
+                        <th style="width:80px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody><tr><td colspan="10" class="loading-row">Loading team tasks…</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CLIENTS PANE -->
+    <div id="pane-clients" class="hidden">
+        <div class="banner" style="background:var(--navy);">MY CLIENTS</div>
+        <div class="client-grid" id="clientList">
+            <div class="loading-row">Loading clients…</div>
+        </div>
+        <div class="banner" style="background:var(--maroon);">CLIENT TASKS</div>
+        <div class="filter-bar">
+            <label>Client</label>
+            <select id="client_tasks_client" onchange="App.loadClientTasks()">
+                <option value="">Select a client…</option>
+            </select>
+            <label>Employee</label>
+            <select id="client_tasks_employee" onchange="App.loadClientTasks()">
+                <option value="">All</option>
+            </select>
+            <label>Status</label>
+            <select id="client_tasks_status" onchange="App.loadClientTasks()">
+                <option value="">All</option><option>Pending</option><option>In Progress</option><option>Completed</option>
+            </select>
+        </div>
+        <div class="table-wrap">
+            <table id="clientTasksTable">
+                <thead>
+                    <tr style="background:var(--navy);">
+                        <th style="width:36px;">SL</th>
+                        <th>Employee</th>
+                        <th>Particulars</th>
+                        <th style="width:8%;">Priority</th>
+                        <th style="width:10%;">Deadline</th>
+                        <th style="width:11%;">Status</th>
+                        <th style="width:12%;">Remarks</th>
+                        <th style="width:80px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody><tr><td colspan="8" class="loading-row">Select a client…</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="pane-admin" class="hidden">
+        <div class="banner" style="background:var(--teal);">ADMIN SETTINGS</div>
+
+        <!-- Text Labels -->
+        <div class="admin-settings-section">
+            <h3>📝 Text Labels</h3>
+            <div class="field-group">
+                <div><label for="setting_particular_label">Particulars</label><input type="text" id="setting_particular_label"></div>
+                <div><label for="setting_addedby_label">Added By</label><input type="text" id="setting_addedby_label"></div>
+                <div><label for="setting_remarks_label">Remarks</label><input type="text" id="setting_remarks_label"></div>
+                <div><label for="setting_management_comment_label">Management Comment</label><input type="text" id="setting_management_comment_label"></div>
+                <div><label for="setting_task_title">My Tasks Title</label><input type="text" id="setting_task_title"></div>
+                <div><label for="setting_near_deadline_title">Near Deadline Title</label><input type="text" id="setting_near_deadline_title"></div>
+                <div><label for="setting_manager_panel_title">Manager Panel Title</label><input type="text" id="setting_manager_panel_title"></div>
+                <div><label for="setting_add_task_button">Add Task Button</label><input type="text" id="setting_add_task_button"></div>
+                <div><label for="setting_logout_button">Logout Button</label><input type="text" id="setting_logout_button"></div>
+            </div>
+            <button class="btn-primary" onclick="Admin.saveLabels()">Save Labels</button>
+        </div>
+
+        <!-- Clients Management -->
+        <div class="admin-settings-section">
+            <h3>🏢 Client Management</h3>
+            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                <input type="text" id="admin_new_client" placeholder="New client name" style="flex:1; min-width:200px; padding:8px 12px; border-radius:8px; border:1px solid var(--line);">
+                <button class="btn-primary btn-sm" onclick="Admin.addClient()">Add Client</button>
+                <button class="btn-secondary btn-sm" onclick="Admin.refreshClients()">Refresh</button>
+            </div>
+            <div class="user-table-wrap">
+                <table>
+                    <thead>
+                        <tr style="background:var(--teal);">
+                            <th>Client Name</th>
+                            <th>Job Number</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminClientBody">
+                        <tr><td colspan="4" class="loading-row">Loading clients…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Manager Client Access -->
+        <div class="admin-settings-section">
+            <h3>🔑 Manager Client Access Control</h3>
+            <div style="display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; align-items:end;">
+                <div style="flex:1; min-width:180px;">
+                    <label>Manager</label>
+                    <select id="access_manager" onchange="Admin.loadManagerAccess()">
+                        <option value="">Select Manager…</option>
+                    </select>
+                </div>
+                <button class="btn-primary btn-sm" onclick="Admin.saveManagerAccess()">Save Access</button>
+                <button class="btn-secondary btn-sm" onclick="Admin.refreshManagerAccess()">Refresh</button>
+            </div>
+            <div id="accessGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; margin-top:8px;">
+                <div class="loading-row">Select a manager to view access</div>
+            </div>
+        </div>
+
+        <!-- Manager Student Assignments -->
+        <div class="admin-settings-section">
+            <h3>👥 Manager Student Assignments</h3>
+            <div style="display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; align-items:end;">
+                <div style="flex:1; min-width:180px;">
+                    <label>Manager</label>
+                    <select id="student_access_manager" onchange="Admin.loadManagerStudents()"><option value="">Select Manager…</option></select>
+                </div>
+                <button class="btn-secondary btn-sm" onclick="Admin.loadManagerStudents()">Refresh</button>
+            </div>
+            <div id="studentAccessGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:8px; margin-top:8px;">
+                <div class="loading-row">Select a manager to view assigned students</div>
+            </div>
+            <button class="btn-primary btn-sm" onclick="Admin.saveManagerStudents()" style="margin-top:12px;">Save Student Assignments</button>
+        </div>
+
+        <!-- User Management -->
+        <div class="admin-settings-section">
+            <h3>👥 User Management</h3>
+            <div class="user-table-wrap">
+                <table>
+                    <thead>
+                        <tr style="background:var(--teal);">
+                            <th>Name</th>
+                            <th>EMP ID</th>
+                            <th>Email</th>
+                            <th>Designation</th>
+                            <th>Profile Client</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userManagementBody">
+                        <tr><td colspan="8" class="loading-row">Loading users…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-primary" onclick="Admin.saveUserChanges()" style="margin-top:12px;">Save User Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<!-- TASK MODAL -->
+<div class="modal-overlay" id="taskModalOverlay">
+    <div class="modal">
+        <h2 id="taskModalTitle">New Task</h2>
+        <div class="field hidden" id="taskClientField">
+            <label>Client</label>
+            <select id="t_client"><option value="">Select assigned client…</option></select>
+        </div>
+        <div class="field hidden" id="assignToField">
+            <label>Assign To</label>
+            <select id="t_assignTo"><option value="">Select team member…</option></select>
+        </div>
+        <div class="field"><label>Particulars</label><textarea id="t_particular" rows="2"></textarea></div>
+        <div class="field"><label>Priority</label>
+            <select id="t_priority"><option>High</option><option selected>Medium</option><option>Low</option></select>
+        </div>
+        <div class="field"><label>Assigned Date</label><input type="date" id="t_assignedDate"></div>
+        <div class="field"><label>Deadline</label><input type="date" id="t_deadline"></div>
+        <div class="field"><label>Status</label>
+            <select id="t_status"><option selected>Pending</option><option>In Progress</option><option>Completed</option></select>
+        </div>
+        <div class="field"><label>Remarks</label><textarea id="t_remarks" rows="2"></textarea></div>
+        <div class="field hidden" id="managerCommentViewField">
+            <label>Manager Comment</label>
+            <div class="comment-block" id="managerCommentView">—</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="App.closeTaskModal()">Cancel</button>
+            <button class="btn-primary" id="taskSaveBtn" onclick="App.saveTask()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- COMMENT MODAL -->
+<div class="modal-overlay" id="commentModalOverlay">
+    <div class="modal">
+        <h2>Manager Comment</h2>
+        <div class="field"><label>Particulars</label><div class="comment-block" id="commentTaskParticular"></div></div>
+        <div class="field"><label>Employee Remarks</label><div class="comment-block" id="commentTaskRemarks">—</div></div>
+        <div class="field"><label>Your Comment</label><textarea id="c_comment" rows="3"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="App.closeCommentModal()">Cancel</button>
+            <button class="btn-primary" onclick="App.saveComment()">Save Comment</button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="editClientModalOverlay">
+    <div class="modal edit-client-modal">
+        <h2>Edit Client</h2>
+        <input type="hidden" id="edit_client_id">
+        <div class="field-group">
+            <div class="field">
+                <label>Client Name</label>
+                <input type="text" id="edit_client_name">
+            </div>
+            <div class="field">
+                <label>Job Number</label>
+                <input type="text" id="edit_client_job" placeholder="e.g., C-26000">
+            </div>
+            <div class="field">
+                <label>Status</label>
+                <select id="edit_client_status">
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="App.closeEditClientModal()">Cancel</button>
+            <button class="btn-primary" onclick="Admin.saveClientEdit()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===========================================================================
+// JAVASCRIPT – Workflow v2.0 (Dual-Mode Native GAS + Vercel/GitHub)
+// ===========================================================================
+var State = {
+    token: null,
+    user: null,
+    allUsers: [],
+    allClients: [],
+    teamMembers: [],
+    currentTasks: [],
+    editingTaskId: null,
+    modalMode: 'own',
+    commentTaskId: null,
+    accessManagerId: null
+};
+
+var RESET_TOKEN = '<?= resetToken ?>';
+var Labels = {};
+var searchTimer = null;
+
+// ===== ROUTER =====
+var Router = {
+    views: ['welcome', 'login', 'signup', 'forgot', 'reset', 'app'],
+    go: function(name) {
+        Router.views.forEach(function(v) {
+            var el = document.getElementById('view-' + v);
+            if (el) el.classList.add('hidden');
+        });
+        var target = document.getElementById('view-' + name);
+        if (target) target.classList.remove('hidden');
+        clearAuthMessages();
+    }
+};
+
+function clearAuthMessages() {
+    ['loginError', 'signupError', 'resetError'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.classList.add('hidden');
+            el.textContent = '';
+        }
+    });
+    var fm = document.getElementById('forgotMessage');
+    if (fm) {
+        fm.classList.add('hidden');
+        fm.textContent = '';
+        fm.className = 'hidden';
+    }
+}
+
+function showError(elId, message) {
+    var el = document.getElementById(elId);
+    if (el) {
+        el.textContent = message;
+        el.classList.remove('hidden');
+    }
+}
+
+function showToast(msg) {
+    var t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(function() { t.classList.remove('show'); }, 2400);
+}
+
+function esc(s) {
+    if (s === undefined || s === null || s === '') return '—';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function fmtDate(dateStr) {
+    if (!dateStr) return '—';
+    var d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function localInputDate(date) {
+    var year = date.getFullYear();
+    var month = String(date.getMonth() + 1).padStart(2, '0');
+    var day = String(date.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+}
+
+function toInputDate(dateStr) {
+    if (!dateStr) return '';
+    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+        return dateStr.slice(0, 10);
+    }
+    var d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return localInputDate(d);
+}
+
+function daysUntilDeadline(dateStr) {
+    if (!dateStr) return null;
+    var parts = String(dateStr).slice(0, 10).split('-');
+    if (parts.length !== 3) return null;
+    var deadline = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((deadline - today) / 86400000);
+}
+
+function statusClass(status, overdue) {
+    if (overdue) return 'status-overdue';
+    return 'status-' + String(status || '').toLowerCase().replace(/ /g, '-');
+}
+
+function priorityClass(priority) { return 'priority-' + String(priority || 'medium').toLowerCase(); }
+
+function setBusy(btnId, busy, busyLabel, idleLabel) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.disabled = busy;
+    btn.textContent = busy ? busyLabel : idleLabel;
+}
+
+function pad(n) { return String(n || 0).padStart(2, '0'); }
+
+function isManagementDesignation(designation) {
+    return ['Manager', 'Senior Assistant Manager', 'Deputy Manager', 'Assistant Director',
+        'Deputy Director', 'Director', 'Partner'].indexOf(designation) !== -1;
+}
+
+function isAllAccessDesignation(designation) {
+    return ['Assistant Director', 'Deputy Director', 'Director', 'Partner'].indexOf(designation) !== -1;
+}
+
+// ===========================================================================
+// AUTH
+// ===========================================================================
+var Auth = {
+    login: function() {
+        var empId = document.getElementById('login_empId').value.trim();
+        var password = document.getElementById('login_password').value;
+        clearAuthMessages();
+        setBusy('loginBtn', true, 'Logging in…', 'Login');
+        google.script.run
+            .withSuccessHandler(function(result) {
+                setBusy('loginBtn', false, 'Logging in…', 'Login');
+                State.token = result.sessionToken;
+                State.user = result.user;
+                localStorage.setItem('acnabin_session_token', result.sessionToken);
+                document.getElementById('login_password').value = '';
+                App.enterApp();
+            })
+            .withFailureHandler(function(err) {
+                setBusy('loginBtn', false, 'Logging in…', 'Login');
+                showError('loginError', err.message || 'Invalid EMP/STD ID or password.');
+            })
+            .loginUser(empId, password);
+    },
+
+    signup: function() {
+        clearAuthMessages();
+        var clientId = document.getElementById('signup_client').dataset.selectedId || '';
+        var payload = {
+            name: document.getElementById('signup_name').value.trim(),
+            empId: document.getElementById('signup_empId').value.trim(),
+            email: document.getElementById('signup_email').value.trim(),
+            designation: document.getElementById('signup_designation').value,
+            clientId: clientId,
+            password: document.getElementById('signup_password').value,
+            confirmPassword: document.getElementById('signup_confirm').value
+        };
+        setBusy('signupBtn', true, 'Creating…', 'Create account');
+        google.script.run
+            .withSuccessHandler(function(result) {
+                setBusy('signupBtn', false, 'Creating…', 'Create account');
+                showToast('✓ ' + (result.message || 'Account created — please log in'));
+                document.getElementById('login_empId').value = payload.empId;
+                Router.go('login');
+            })
+            .withFailureHandler(function(err) {
+                setBusy('signupBtn', false, 'Creating…', 'Create account');
+                showError('signupError', err.message || 'Could not create account.');
+            })
+            .registerUser(payload);
+    },
+
+    requestReset: function() {
+        clearAuthMessages();
+        var email = document.getElementById('forgot_email').value.trim();
+        setBusy('forgotBtn', true, 'Sending…', 'Send reset link');
+        google.script.run
+            .withSuccessHandler(function(result) {
+                setBusy('forgotBtn', false, 'Sending…', 'Send reset link');
+                var fm = document.getElementById('forgotMessage');
+                fm.textContent = result.message;
+                fm.className = 'auth-success';
+            })
+            .withFailureHandler(function(err) {
+                setBusy('forgotBtn', false, 'Sending…', 'Send reset link');
+                var fm = document.getElementById('forgotMessage');
+                fm.textContent = err.message || 'Something went wrong. Please try again.';
+                fm.className = 'auth-error';
+            })
+            .requestPasswordReset(email);
+    },
+
+    submitReset: function() {
+        clearAuthMessages();
+        var pw = document.getElementById('reset_password').value;
+        var confirm = document.getElementById('reset_confirm').value;
+        if (pw !== confirm) { showError('resetError', 'Passwords do not match.'); return; }
+        setBusy('resetBtn', true, 'Updating…', 'Update password');
+        google.script.run
+            .withSuccessHandler(function(result) {
+                setBusy('resetBtn', false, 'Updating…', 'Update password');
+                showToast('✓ ' + result.message);
+                Router.go('login');
+            })
+            .withFailureHandler(function(err) {
+                setBusy('resetBtn', false, 'Updating…', 'Update password');
+                showError('resetError', err.message || 'Could not reset password.');
+            })
+            .resetPassword(RESET_TOKEN, pw);
+    },
+
+    logout: function() {
+        var token = State.token;
+        localStorage.removeItem('acnabin_session_token');
+        State.token = null;
+        State.user = null;
+        Router.go('welcome');
+        if (token) google.script.run.logoutUser(token);
+    }
+};
+
+// ===========================================================================
+// SIGNUP HELPERS
+// ===========================================================================
+var Signup = {
+    onDesignationChange: function() {
+        var des = document.getElementById('signup_designation').value;
+        var field = document.getElementById('clientField');
+        var hint = document.getElementById('clientHint');
+        if (des === 'Student') {
+            field.style.display = 'block';
+            hint.textContent = 'Please select your client.';
+        } else {
+            field.style.display = 'block';
+            hint.textContent = 'Optional for non-students.';
+        }
+    },
+
+    searchClients: function() {
+        var input = document.getElementById('signup_client');
+        var term = input.value.trim();
+        var suggestions = document.getElementById('clientSuggestions');
+        if (term.length < 1) {
+            suggestions.classList.add('hidden');
+            suggestions.innerHTML = '';
+            delete input.dataset.selectedId;
+            return;
+        }
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+            google.script.run
+                .withSuccessHandler(function(results) {
+                    if (!results || results.length === 0) {
+                        suggestions.innerHTML = '<div style="color:var(--ink-soft);padding:8px 12px;">No clients found</div>';
+                        suggestions.classList.remove('hidden');
+                        return;
+                    }
+                    suggestions.innerHTML = '';
+                    results.forEach(function(c) {
+                        var option = document.createElement('div');
+                        option.textContent = c.name + (c.jobNumber ? ' (' + c.jobNumber + ')' : '');
+                        option.addEventListener('mousedown', function() { Signup.selectClient(c.id, c.name); });
+                        suggestions.appendChild(option);
+                    });
+                    suggestions.classList.remove('hidden');
+                })
+                .withFailureHandler(function() {
+                    suggestions.innerHTML = '<div style="color:var(--maroon);padding:8px 12px;">Error searching clients</div>';
+                    suggestions.classList.remove('hidden');
+                })
+                .searchClients(State.token || 'temp', term);
+        }, 300);
+    },
+
+    selectClient: function(id, name) {
+        var input = document.getElementById('signup_client');
+        input.value = name;
+        input.dataset.selectedId = id;
+        document.getElementById('clientSuggestions').classList.add('hidden');
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    var clientInput = document.getElementById('signup_client');
+    if (clientInput) {
+        clientInput.addEventListener('input', Signup.searchClients);
+        clientInput.addEventListener('blur', function() {
+            setTimeout(function() {
+                var el = document.getElementById('clientSuggestions');
+                if (el) el.classList.add('hidden');
+            }, 250);
+        });
+        clientInput.addEventListener('focus', function() {
+            if (this.value.trim().length > 0) {
+                Signup.searchClients();
+            }
+        });
+    }
+});
+
+// ===========================================================================
+// APP
+// ===========================================================================
+var App = {
+    updateProfileClient: function() {
+        var clientEl = document.getElementById('whoClient');
+        if (!clientEl || !State.user) return;
+        var clientName = State.user.clientName || '';
+        if (!clientName && State.user.clientNames && State.user.clientNames.length) {
+            clientName = State.user.clientNames.join(', ');
+        }
+        if (!clientName && State.user.clientId) {
+            var client = State.allClients.find(function(candidate) {
+                return candidate.id === State.user.clientId;
+            });
+            clientName = client ? client.name : '';
+        }
+        clientEl.textContent = clientName ? (State.user.clientNames && State.user.clientNames.length ? 'Clients: ' : 'Client: ') + clientName : '';
+    },
+
+    enterApp: function() {
+        document.getElementById('whoName').textContent = State.user.name;
+        App.updateProfileClient();
+
+        var roleBadge = document.getElementById('whoRole');
+        var label = State.user.designation || State.user.roleLabel || 'User';
+        roleBadge.textContent = label;
+        roleBadge.className = 'who-role';
+        if (State.user.role === 'ADMIN') roleBadge.classList.add('admin');
+        else if (isManagementDesignation(State.user.designation)) {
+            roleBadge.classList.add('manager');
+        } else {
+            roleBadge.classList.add('student');
+        }
+
+        var isManager = State.user.role === 'ADMIN' || isManagementDesignation(State.user.designation);
+
+        document.getElementById('managerTabs').classList.toggle('hidden', !isManager);
+        document.getElementById('adminTabBtn').classList.toggle('hidden', State.user.role !== 'ADMIN');
+
+        // Load all data
+        App.loadClients();
+        App.loadUsers();
+
+        if (isManager) {
+            document.getElementById('pageTitle').textContent = Labels.manager_panel_title || 'MANAGER PANEL';
+            document.getElementById('pageSubtitle').textContent = 'Task and To-Do List — Management View';
+        } else {
+            document.getElementById('pageTitle').textContent = Labels.task_title || 'MY TASKS';
+            document.getElementById('pageSubtitle').textContent = 'Task and To-Do List';
+        }
+
+        App.switchTab('own');
+        Router.go('app');
+    },
+
+    loadClients: function() {
+        google.script.run
+            .withSuccessHandler(function(clients) {
+                State.allClients = clients || [];
+                App.updateProfileClient();
+                App.populateClientSelects();
+                App.renderClientList();
+            })
+            .withFailureHandler(function(err) { showToast('✗ Could not load clients: ' + err.message); })
+            .getActiveClients(State.token);
+    },
+
+    loadUsers: function() {
+        google.script.run
+            .withSuccessHandler(function(users) {
+                State.allUsers = users || [];
+                State.teamMembers = State.allUsers;
+                App.populateUserSelects();
+            })
+            .withFailureHandler(function(err) { showToast('✗ Could not load users: ' + err.message); })
+            .getTeamMembers(State.token);
+    },
+
+    populateClientSelects: function() {
+        var selects = ['team_client', 'client_tasks_client'];
+        selects.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var currentVal = el.value;
+            el.innerHTML = '<option value="">Select Client…</option>' +
+                State.allClients.map(function(c) {
+                    return '<option value="' + c.id + '">' + esc(c.name) + (c.jobNumber ? ' (' + esc(c.jobNumber) + ')' : '') + '</option>';
+                }).join('');
+            if (currentVal) el.value = currentVal;
+        });
+    },
+
+    populateUserSelects: function() {
+        var teamSelect = document.getElementById('team_member');
+        if (teamSelect) {
+            var currentVal = teamSelect.value;
+            var users = State.allUsers.filter(function(u) { return u.userId !== State.user.id; });
+            teamSelect.innerHTML = '<option value="">All team members</option>' +
+                users.map(function(u) {
+                    return '<option value="' + u.userId + '">' + esc(u.name) + ' — ' + esc(u.empId) + ' (' + esc(u.designation || 'User') + ')</option>';
+                }).join('');
+            if (currentVal) teamSelect.value = currentVal;
+        }
+
+        var managers = State.allUsers.filter(function(u) {
+            return isManagementDesignation(u.designation);
+        });
+
+        var accessSelect = document.getElementById('access_manager');
+        if (accessSelect) {
+            var currentVal2 = accessSelect.value;
+            accessSelect.innerHTML = '<option value="">Select Manager…</option>' +
+                managers.map(function(u) {
+                    return '<option value="' + u.userId + '">' + esc(u.name) + ' — ' + esc(u.empId) + ' (' + esc(u.designation) + ')</option>';
+                }).join('');
+            if (currentVal2) accessSelect.value = currentVal2;
+        }
+
+        var studentAccessSelect = document.getElementById('student_access_manager');
+        if (studentAccessSelect) {
+            var currentVal3 = studentAccessSelect.value;
+            studentAccessSelect.innerHTML = '<option value="">Select Manager…</option>' +
+                managers.map(function(u) {
+                    return '<option value="' + u.userId + '">' + esc(u.name) + ' — ' + esc(u.empId) + ' (' + esc(u.designation) + ')</option>';
+                }).join('');
+            if (currentVal3) studentAccessSelect.value = currentVal3;
+        }
+
+        var empSelect = document.getElementById('client_tasks_employee');
+        if (empSelect) {
+            var currentVal4 = empSelect.value;
+            empSelect.innerHTML = '<option value="">All</option>' +
+                State.allUsers.filter(function(u) { return u.userId !== State.user.id; }).map(function(u) {
+                    return '<option value="' + u.userId + '">' + esc(u.name) + '</option>';
+                }).join('');
+            if (currentVal4) empSelect.value = currentVal4;
+        }
+    },
+
+    switchTab: function(tab) {
+        document.querySelectorAll('.tab').forEach(function(b) {
+            b.classList.toggle('active', b.dataset.tab === tab);
+        });
+        document.getElementById('pane-own').classList.toggle('hidden', tab !== 'own');
+        document.getElementById('pane-team').classList.toggle('hidden', tab !== 'team');
+        document.getElementById('pane-clients').classList.toggle('hidden', tab !== 'clients');
+        document.getElementById('pane-admin').classList.toggle('hidden', tab !== 'admin');
+
+        if (tab === 'own') App.loadMyTasks();
+        if (tab === 'team') App.loadTeamTasks();
+        if (tab === 'clients') { App.renderClientList(); App.loadClientTasks(); }
+        if (tab === 'admin') Admin.switchTab('admin');
+    },
+
+    loadMyTasks: function() {
+        google.script.run
+            .withSuccessHandler(function(tasks) {
+                State.currentTasks = tasks || [];
+                App.renderOwnTasks(tasks);
+            })
+            .withFailureHandler(function(err) {
+                showToast('✗ ' + err.message);
+                document.querySelector('#ownTable tbody').innerHTML =
+                    '<tr><td class="empty" colspan="9">' + esc(err.message) + '</td></tr>';
+            })
+            .getMyTasks(State.token);
+    },
+
+    renderOwnTasks: function(tasks) {
+        var s = App.summarize(tasks);
+        document.getElementById('own_total').textContent = pad(s.total);
+        document.getElementById('own_pending').textContent = pad(s.pending);
+        document.getElementById('own_progress').textContent = pad(s.inProgress);
+        document.getElementById('own_completed').textContent = pad(s.completed);
+        document.getElementById('own_overdue').textContent = pad(s.overdue);
+
+        var body = document.querySelector('#ownTable tbody');
+        if (!tasks || tasks.length === 0) {
+            body.innerHTML = '<tr><td class="empty" colspan="9">No tasks yet</td></tr>';
+        } else {
+            body.innerHTML = tasks.map(function(t, i) {
+                return '<tr>' +
+                    '<td class="sl">' + (i + 1) + '</td>' +
+                    '<td class="particular">' + esc(t.particular) + '</td>' +
+                    '<td>' + esc(t.createdByName) + '</td>' +
+                    '<td><span class="priority-badge ' + priorityClass(t.priority) + '">' + esc(t.priority) + '</span></td>' +
+                    '<td class="' + (t.isOverdue ? 'overdue-cell' : '') + '">' + fmtDate(t.deadline) + '</td>' +
+                    '<td><span class="status-badge ' + statusClass(t.status, t.isOverdue) + '">' + (t.isOverdue ? 'Overdue' : esc(t.status)) + '</span></td>' +
+                    '<td class="remarks">' + esc(t.remarks) + '</td>' +
+                    '<td class="comment">' + (t.managerComment ? esc(t.managerComment) : '—') + '</td>' +
+                    '<td>' +
+                    '<button class="icon-btn" onclick="App.openEditTaskModal(' + JSON.stringify(t).replace(/"/g, '&quot;') + ')" title="Edit">✎</button>' +
+                    '<button class="icon-btn danger" onclick="App.deleteTask(\'' + t.taskId + '\')" title="Delete">🗑</button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+        App.renderNearDeadlineTasks(tasks);
+    },
+
+    renderNearDeadlineTasks: function(tasks) {
+        var nearDeadline = (tasks || []).filter(function(t) {
+            var days = daysUntilDeadline(t.deadline);
+            return t.status !== 'Completed' && days !== null && days >= 0 && days <= 3;
+        }).sort(function(a, b) {
+            return daysUntilDeadline(a.deadline) - daysUntilDeadline(b.deadline);
+        });
+        var body = document.querySelector('#nearDeadlineTable tbody');
+        if (nearDeadline.length === 0) {
+            body.innerHTML = '<tr><td class="empty" colspan="9">No near-deadline tasks</td></tr>';
+        } else {
+            body.innerHTML = nearDeadline.map(function(t, i) {
+                return '<tr>' +
+                    '<td class="sl">' + (i + 1) + '</td>' +
+                    '<td class="particular">' + esc(t.particular) + '</td>' +
+                    '<td>' + esc(t.createdByName) + '</td>' +
+                    '<td><span class="priority-badge ' + priorityClass(t.priority) + '">' + esc(t.priority) + '</span></td>' +
+                    '<td class="' + (t.isOverdue ? 'overdue-cell' : '') + '">' + fmtDate(t.deadline) + '</td>' +
+                    '<td><span class="status-badge ' + statusClass(t.status, t.isOverdue) + '">' + (t.isOverdue ? 'Overdue' : esc(t.status)) + '</span></td>' +
+                    '<td class="remarks">' + esc(t.remarks) + '</td>' +
+                    '<td class="comment">' + (t.managerComment ? esc(t.managerComment) : '—') + '</td>' +
+                    '<td>' +
+                    '<button class="icon-btn" onclick="App.openEditTaskModal(' + JSON.stringify(t).replace(/"/g, '&quot;') + ')" title="Edit">✎</button>' +
+                    '<button class="icon-btn danger" onclick="App.deleteTask(\'' + t.taskId + '\')" title="Delete">🗑</button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+    },
+
+    summarize: function(tasks) {
+        tasks = tasks || [];
+        return {
+            total: tasks.length,
+            pending: tasks.filter(function(t) { return t.status === 'Pending'; }).length,
+            inProgress: tasks.filter(function(t) { return t.status === 'In Progress'; }).length,
+            completed: tasks.filter(function(t) { return t.status === 'Completed'; }).length,
+            overdue: tasks.filter(function(t) { return t.isOverdue; }).length
+        };
+    },
+
+    deleteTask: function(taskId) {
+        if (!confirm('Are you sure you want to delete this task?')) return;
+        google.script.run
+            .withSuccessHandler(function() {
+                showToast('✓ Task deleted');
+                App.loadMyTasks();
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .deleteTask(State.token, taskId);
+    },
+
+    loadTeamTasks: function() {
+        var userId = document.getElementById('team_member').value;
+        var clientId = document.getElementById('team_client').value;
+        var status = document.getElementById('team_status').value;
+        var overdue = document.getElementById('team_overdue').checked;
+
+        var filters = {};
+        if (userId) filters.assignedTo = userId;
+        if (clientId) filters.clientId = clientId;
+        if (status) filters.status = status;
+        if (overdue) filters.overdueOnly = true;
+
+        google.script.run
+            .withSuccessHandler(function(tasks) {
+                State.currentTasks = tasks || [];
+                App.renderTeamTasks(tasks);
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .getTasks(State.token, filters);
+    },
+
+    renderTeamTasks: function(tasks) {
+        var s = App.summarize(tasks);
+        document.getElementById('team_total').textContent = pad(s.total);
+        document.getElementById('team_pending').textContent = pad(s.pending);
+        document.getElementById('team_progress').textContent = pad(s.inProgress);
+        document.getElementById('team_completed').textContent = pad(s.completed);
+        document.getElementById('team_overdue_count').textContent = pad(s.overdue);
+
+        var body = document.querySelector('#teamTable tbody');
+        if (!tasks || tasks.length === 0) {
+            body.innerHTML = '<tr><td class="empty" colspan="10">No tasks found for team members</td></tr>';
+        } else {
+            body.innerHTML = tasks.map(function(t, i) {
+                return '<tr>' +
+                    '<td class="sl">' + (i + 1) + '</td>' +
+                    '<td class="name">' + esc(t.assignedToName) + '<br><span style="color:var(--ink-soft);font-size:10px;">' + esc(t.assignedToEmpId) + '</span></td>' +
+                    '<td>' + esc(t.clientName) + '</td>' +
+                    '<td class="particular">' + esc(t.particular) + '</td>' +
+                    '<td><span class="priority-badge ' + priorityClass(t.priority) + '">' + esc(t.priority) + '</span></td>' +
+                    '<td class="' + (t.isOverdue ? 'overdue-cell' : '') + '">' + fmtDate(t.deadline) + '</td>' +
+                    '<td><span class="status-badge ' + statusClass(t.status, t.isOverdue) + '">' + (t.isOverdue ? 'Overdue' : esc(t.status)) + '</span></td>' +
+                    '<td class="remarks">' + esc(t.remarks) + '</td>' +
+                    '<td class="comment">' + (t.managerComment ? esc(t.managerComment) : '—') + '</td>' +
+                    '<td>' +
+                    '<button class="icon-btn teal-hover" title="Add/edit comment" onclick="App.openCommentModal(' + JSON.stringify(t).replace(/"/g, '&quot;') + ')">💬</button>' +
+                    '<button class="icon-btn danger" onclick="App.deleteTask(\'' + t.taskId + '\')" title="Delete">🗑</button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+    },
+
+    renderClientList: function() {
+        var container = document.getElementById('clientList');
+        if (!State.allClients || State.allClients.length === 0) {
+            container.innerHTML = '<div class="loading-row">No clients available</div>';
+            return;
+        }
+        container.innerHTML = State.allClients.map(function(c) {
+            var jobDisplay = c.jobNumber ? 'Job # ' + esc(c.jobNumber) : '<span class="empty">—</span>';
+            return '<div class="client-card">' +
+                '<div class="name">' + esc(c.name) + '</div>' +
+                '<div class="job">' + jobDisplay + '</div>' +
+                '</div>';
+        }).join('');
+    },
+
+    loadClientTasks: function() {
+        var clientId = document.getElementById('client_tasks_client').value;
+        var employeeId = document.getElementById('client_tasks_employee').value;
+        var status = document.getElementById('client_tasks_status').value;
+
+        if (!clientId) {
+            document.querySelector('#clientTasksTable tbody').innerHTML =
+                '<tr><td class="empty" colspan="8">Select a client…</td></tr>';
+            return;
+        }
+
+        var filters = { clientId: clientId };
+        if (employeeId) filters.assignedTo = employeeId;
+        if (status) filters.status = status;
+
+        google.script.run
+            .withSuccessHandler(function(tasks) {
+                App.renderClientTasks(tasks);
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .getTasks(State.token, filters);
+    },
+
+    renderClientTasks: function(tasks) {
+        var body = document.querySelector('#clientTasksTable tbody');
+        if (!tasks || tasks.length === 0) {
+            body.innerHTML = '<tr><td class="empty" colspan="8">No tasks for this client</td></tr>';
+        } else {
+            body.innerHTML = tasks.map(function(t, i) {
+                return '<tr>' +
+                    '<td class="sl">' + (i + 1) + '</td>' +
+                    '<td class="name">' + esc(t.assignedToName) + '</td>' +
+                    '<td class="particular">' + esc(t.particular) + '</td>' +
+                    '<td><span class="priority-badge ' + priorityClass(t.priority) + '">' + esc(t.priority) + '</span></td>' +
+                    '<td class="' + (t.isOverdue ? 'overdue-cell' : '') + '">' + fmtDate(t.deadline) + '</td>' +
+                    '<td><span class="status-badge ' + statusClass(t.status, t.isOverdue) + '">' + (t.isOverdue ? 'Overdue' : esc(t.status)) + '</span></td>' +
+                    '<td class="remarks">' + esc(t.remarks) + '</td>' +
+                    '<td>' +
+                    '<button class="icon-btn teal-hover" title="Add/edit comment" onclick="App.openCommentModal(' + JSON.stringify(t).replace(/"/g, '&quot;') + ')">💬</button>' +
+                    '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+    },
+
+    openAddTaskModal: function(mode) {
+        State.editingTaskId = null;
+        State.modalMode = mode || 'own';
+        document.getElementById('taskModalTitle').textContent = 'New Task';
+
+        var isManager = State.user.role === 'ADMIN' || isManagementDesignation(State.user.designation);
+
+        document.getElementById('taskClientField').classList.toggle('hidden', !isManager);
+        document.getElementById('assignToField').classList.toggle('hidden', mode !== 'team' || !isManager);
+
+        var clientSelect = document.getElementById('t_client');
+        var currentClientVal = clientSelect.value;
+        clientSelect.innerHTML = '<option value="">Select assigned client…</option>' +
+            State.allClients.map(function(c) {
+                return '<option value="' + c.id + '">' + esc(c.name) + (c.jobNumber ? ' (' + esc(c.jobNumber) + ')' : '') + '</option>';
+            }).join('');
+        if (currentClientVal) clientSelect.value = currentClientVal;
+
+        document.getElementById('t_assignTo').innerHTML = '<option value="">Select team member…</option>' +
+            State.teamMembers.filter(function(member) { return member.userId !== State.user.id; }).map(function(member) {
+                return '<option value="' + member.userId + '">' + esc(member.name) + ' — ' + esc(member.empId) + '</option>';
+            }).join('');
+
+        document.getElementById('managerCommentViewField').classList.add('hidden');
+        document.getElementById('t_particular').value = '';
+        document.getElementById('t_priority').value = 'Medium';
+        document.getElementById('t_assignedDate').value = localInputDate(new Date());
+        document.getElementById('t_deadline').value = '';
+        document.getElementById('t_status').value = 'Pending';
+        document.getElementById('t_remarks').value = '';
+        document.getElementById('taskModalOverlay').classList.add('open');
+    },
+
+    openEditTaskModal: function(t) {
+        State.editingTaskId = t.taskId;
+        State.modalMode = 'own';
+        document.getElementById('taskModalTitle').textContent = 'Edit Task — ' + t.taskId;
+        document.getElementById('taskClientField').classList.add('hidden');
+        document.getElementById('assignToField').classList.add('hidden');
+        document.getElementById('t_particular').value = t.particular || '';
+        document.getElementById('t_priority').value = t.priority || 'Medium';
+        document.getElementById('t_assignedDate').value = toInputDate(t.assignedDate);
+        document.getElementById('t_deadline').value = toInputDate(t.deadline);
+        document.getElementById('t_status').value = t.status || 'Pending';
+        document.getElementById('t_remarks').value = t.remarks || '';
+        var commentField = document.getElementById('managerCommentViewField');
+        if (t.managerComment) {
+            document.getElementById('managerCommentView').textContent = t.managerComment;
+            commentField.classList.remove('hidden');
+        } else {
+            commentField.classList.add('hidden');
+        }
+        document.getElementById('taskModalOverlay').classList.add('open');
+    },
+
+    closeTaskModal: function() {
+        document.getElementById('taskModalOverlay').classList.remove('open');
+    },
+
+    saveTask: function() {
+        var saveBtn = document.getElementById('taskSaveBtn');
+        if (saveBtn.disabled) return;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving…';
+
+        var particular = document.getElementById('t_particular').value.trim();
+        if (!particular) {
+            showToast('Particulars are required');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
+            return;
+        }
+
+        var payload = {
+            particular: particular,
+            priority: document.getElementById('t_priority').value,
+            assignedDate: document.getElementById('t_assignedDate').value,
+            deadline: document.getElementById('t_deadline').value,
+            status: document.getElementById('t_status').value,
+            remarks: document.getElementById('t_remarks').value.trim()
+        };
+
+        var isManager = State.user.role === 'ADMIN' || isManagementDesignation(State.user.designation);
+
+        if (!State.editingTaskId && isManager) {
+            var clientId = document.getElementById('t_client').value;
+            if (clientId) {
+                payload.clientId = clientId;
+            }
+            if (State.modalMode === 'team') {
+                var assignedTo = document.getElementById('t_assignTo').value;
+                if (!assignedTo) {
+                    showToast('Select a team member');
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                    return;
+                }
+                payload.assignedTo = assignedTo;
+            }
+        }
+
+        var func = State.editingTaskId ? 'updateTask' : 'createTask';
+        var args = State.editingTaskId ? [State.token, State.editingTaskId, payload] : [State.token, payload];
+
+        var runner = google.script.run
+            .withSuccessHandler(function() {
+                App.closeTaskModal();
+                showToast(State.editingTaskId ? '✓ Task updated' : '✓ Task created');
+                App.loadMyTasks();
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+            })
+            .withFailureHandler(function(err) {
+                showToast('✗ ' + err.message);
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+            });
+        runner[func].apply(runner, args);
+    },
+
+    openCommentModal: function(t) {
+        State.commentTaskId = t.taskId;
+        document.getElementById('commentTaskParticular').textContent = t.particular;
+        document.getElementById('commentTaskRemarks').textContent = t.remarks || '—';
+        document.getElementById('c_comment').value = t.managerComment || '';
+        document.getElementById('commentModalOverlay').classList.add('open');
+    },
+
+    closeCommentModal: function() {
+        document.getElementById('commentModalOverlay').classList.remove('open');
+    },
+
+    saveComment: function() {
+        var comment = document.getElementById('c_comment').value;
+        google.script.run
+            .withSuccessHandler(function() {
+                App.closeCommentModal();
+                showToast('✓ Comment saved');
+                App.loadMyTasks();
+                if (!document.getElementById('pane-team').classList.contains('hidden')) {
+                    App.loadTeamTasks();
+                }
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .addManagerComment(State.token, State.commentTaskId, comment);
+    },
+
+    openEditClientModal: function(clientId) {
+        var client = State.allClients.find(function(c) { return c.id === clientId; });
+        if (!client) { showToast('Client not found'); return; }
+        document.getElementById('edit_client_id').value = clientId;
+        document.getElementById('edit_client_name').value = client.name || '';
+        document.getElementById('edit_client_job').value = client.jobNumber || '';
+        document.getElementById('edit_client_status').value = client.status || 'ACTIVE';
+        document.getElementById('editClientModalOverlay').classList.add('open');
+    },
+
+    closeEditClientModal: function() {
+        document.getElementById('editClientModalOverlay').classList.remove('open');
+    }
+};
+
+// ===========================================================================
+// ADMIN
+// ===========================================================================
+var Admin = {
+    switchTab: function(tab) {
+        document.querySelectorAll('.tab').forEach(function(b) {
+            b.classList.toggle('active', b.dataset.tab === tab);
+        });
+        document.getElementById('pane-own').classList.add('hidden');
+        document.getElementById('pane-team').classList.add('hidden');
+        document.getElementById('pane-clients').classList.add('hidden');
+        document.getElementById('pane-admin').classList.remove('hidden');
+        Admin.loadSettings();
+        Admin.loadUsers();
+        Admin.loadClients();
+        Admin.loadManagerAccess();
+    },
+
+    loadSettings: function() {
+        google.script.run
+            .withSuccessHandler(function(settings) {
+                Labels = settings || {};
+                var map = {
+                    'particular_label': 'setting_particular_label',
+                    'addedby_label': 'setting_addedby_label',
+                    'remarks_label': 'setting_remarks_label',
+                    'management_comment_label': 'setting_management_comment_label',
+                    'task_title': 'setting_task_title',
+                    'near_deadline_title': 'setting_near_deadline_title',
+                    'manager_panel_title': 'setting_manager_panel_title',
+                    'add_task_button': 'setting_add_task_button',
+                    'logout_button': 'setting_logout_button'
+                };
+                for (var key in map) {
+                    var el = document.getElementById(map[key]);
+                    if (el && settings[key] !== undefined) el.value = settings[key];
+                }
+                App.applyLabels();
+            })
+            .withFailureHandler(function(err) { showToast('✗ Could not load settings: ' + err.message); })
+            .getAppSettings(State.token);
+    },
+
+    saveLabels: function() {
+        var settings = {
+            particular_label: document.getElementById('setting_particular_label').value,
+            addedby_label: document.getElementById('setting_addedby_label').value,
+            remarks_label: document.getElementById('setting_remarks_label').value,
+            management_comment_label: document.getElementById('setting_management_comment_label').value,
+            task_title: document.getElementById('setting_task_title').value,
+            near_deadline_title: document.getElementById('setting_near_deadline_title').value,
+            manager_panel_title: document.getElementById('setting_manager_panel_title').value,
+            add_task_button: document.getElementById('setting_add_task_button').value,
+            logout_button: document.getElementById('setting_logout_button').value
+        };
+        var keys = Object.keys(settings);
+        var saved = 0;
+        var total = keys.length;
+        keys.forEach(function(key) {
+            google.script.run
+                .withSuccessHandler(function() {
+                    saved++;
+                    if (saved === total) {
+                        showToast('✓ Labels saved');
+                        Admin.loadSettings();
+                    }
+                })
+                .withFailureHandler(function() { showToast('✗ Error saving: ' + key); })
+                .updateAppSetting(State.token, key, settings[key]);
+        });
+    },
+
+    loadClients: function() {
+        google.script.run
+            .withSuccessHandler(function(clients) {
+                State.allClients = clients || [];
+                var body = document.getElementById('adminClientBody');
+                if (!clients || clients.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4" class="empty">No clients found</td></tr>';
+                    return;
+                }
+                body.innerHTML = clients.map(function(c) {
+                    var statusOptions = ['ACTIVE', 'INACTIVE'].map(function(s) {
+                        return '<option value="' + s + '"' + (c.status === s ? ' selected' : '') + '>' + s + '</option>';
+                    }).join('');
+                    return '<tr>' +
+                        '<td>' + esc(c.name) + '</td>' +
+                        '<td>' + esc(c.jobNumber || '—') + '</td>' +
+                        '<td><select class="client-status-select" data-clientid="' + c.id + '">' + statusOptions + '</select></td>' +
+                        '<td>' +
+                        '<button class="btn-secondary btn-sm" onclick="App.openEditClientModal(\'' + c.id + '\')">✎ Edit</button> ' +
+                        '<button class="btn-secondary btn-sm" onclick="Admin.saveClientStatus(this)">Save Status</button>' +
+                        '</td>' +
+                        '</tr>';
+                }).join('');
+                App.populateClientSelects();
+                App.renderClientList();
+            })
+            .withFailureHandler(function(err) { showToast('✗ Could not load clients: ' + err.message); })
+            .getAllClients(State.token);
+    },
+
+    refreshClients: function() {
+        Admin.loadClients();
+    },
+
+    addClient: function() {
+        var name = document.getElementById('admin_new_client').value.trim();
+        if (!name) { showToast('Please enter a client name'); return; }
+        google.script.run
+            .withSuccessHandler(function(result) {
+                showToast('✓ Client added: ' + result.clientName);
+                document.getElementById('admin_new_client').value = '';
+                Admin.loadClients();
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .addClient(State.token, name);
+    },
+
+    saveClientStatus: function(btn) {
+        var row = btn.closest('tr');
+        var select = row.querySelector('.client-status-select');
+        var clientId = select.dataset.clientid;
+        var status = select.value;
+        var func = status === 'ACTIVE' ? 'reactivateClient' : 'deactivateClient';
+
+        var runner = google.script.run
+            .withSuccessHandler(function() {
+                showToast('✓ Client status updated');
+                Admin.loadClients();
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); });
+        runner[func](State.token, clientId);
+    },
+
+    saveClientEdit: function() {
+        var clientId = document.getElementById('edit_client_id').value;
+        var name = document.getElementById('edit_client_name').value.trim();
+        var jobNumber = document.getElementById('edit_client_job').value.trim();
+        var status = document.getElementById('edit_client_status').value;
+
+        if (!name) { showToast('Client name is required'); return; }
+
+        google.script.run
+            .withSuccessHandler(function() {
+                showToast('✓ Client updated');
+                App.closeEditClientModal();
+                Admin.loadClients();
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .updateClient(State.token, clientId, name, jobNumber, status);
+    },
+
+    loadUsers: function() {
+        google.script.run
+            .withSuccessHandler(function(users) {
+                State.allUsers = users || [];
+                State.teamMembers = State.allUsers;
+                var body = document.getElementById('userManagementBody');
+                if (!users || users.length === 0) {
+                    body.innerHTML = '<tr><td colspan="8" class="empty">No users found</td></tr>';
+                    return;
+                }
+                body.innerHTML = users.map(function(u) {
+                    var desOptions = ['Student', 'Senior Assistant Manager', 'Deputy Manager', 'Manager',
+                            'Assistant Director', 'Deputy Director', 'Director', 'Partner'
+                        ]
+                        .map(function(d) { return '<option value="' + d + '"' + (u.designation === d ? ' selected' : '') + '>' + d + '</option>'; })
+                        .join('');
+                    var roleOptions = ['USER', 'ADMIN'].map(function(r) {
+                        return '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + r + '</option>';
+                    }).join('');
+                    var statusOptions = ['ACTIVE', 'INACTIVE', 'PENDING'].map(function(s) {
+                        return '<option value="' + s + '"' + (u.status === s ? ' selected' : '') + '>' + s + '</option>';
+                    }).join('');
+                    var clientOptions = '<option value="">No client</option>' + State.allClients.map(function(client) {
+                        return '<option value="' + client.id + '"' + (u.clientId === client.id ? ' selected' : '') + '>' + esc(client.name) + '</option>';
+                    }).join('');
+                    var isSelf = u.userId === State.user.id;
+                    return '<tr>' +
+                        '<td>' + esc(u.name) + (isSelf ? ' <span style="font-size:10px;color:var(--teal);">(you)</span>' : '') + '</td>' +
+                        '<td>' + esc(u.empId) + '</td>' +
+                        '<td>' + esc(u.email) + '</td>' +
+                        '<td><select class="user-des-select" data-userid="' + u.userId + '"' + (isSelf ? ' disabled' : '') + '>' + desOptions + '</select></td>' +
+                        '<td><select class="user-client-select" data-userid="' + u.userId + '"' + (isSelf || u.designation !== 'Student' ? ' disabled' : '') + '>' + clientOptions + '</select></td>' +
+                        '<td><select class="user-role-select" data-userid="' + u.userId + '"' + (isSelf ? ' disabled' : '') + '>' + roleOptions + '</select></td>' +
+                        '<td><select class="user-status-select" data-userid="' + u.userId + '"' + (isSelf ? ' disabled' : '') + '>' + statusOptions + '</select></td>' +
+                        '<td>' + (isSelf ? '—' : '<button class="btn-secondary btn-sm" onclick="Admin.saveSingleUser(this)">Save</button>') + '</td>' +
+                        '</tr>';
+                }).join('');
+                App.populateUserSelects();
+            })
+            .withFailureHandler(function(err) { showToast('✗ Could not load users: ' + err.message); })
+            .getAllUsers(State.token);
+    },
+
+    saveSingleUser: function(btn) {
+        var row = btn.closest('tr');
+        var des = row.querySelector('.user-des-select').value;
+        var client = row.querySelector('.user-client-select').value;
+        var role = row.querySelector('.user-role-select').value;
+        var status = row.querySelector('.user-status-select').value;
+        var userId = row.querySelector('.user-des-select').dataset.userid;
+
+        var tasks = [
+            ['updateUserDesignation', [State.token, userId, des]],
+            ['updateUserClient', [State.token, userId, client]],
+            ['updateUserRole', [State.token, userId, role]],
+            ['updateUserStatus', [State.token, userId, status]]
+        ];
+
+        var done = 0;
+        tasks.forEach(function(item) {
+            var runner = google.script.run
+                .withSuccessHandler(function() {
+                    done++;
+                    if (done === tasks.length) {
+                        showToast('✓ User updated');
+                        Admin.loadUsers();
+                    }
+                })
+                .withFailureHandler(function(err) { showToast('✗ ' + err.message); });
+            runner[item[0]].apply(runner, item[1]);
+        });
+    },
+
+    saveUserChanges: function() {
+        var rows = document.querySelectorAll('#userManagementBody tr');
+        var total = rows.length;
+        if (total === 0) { showToast('No users to save'); return; }
+
+        var count = 0;
+        rows.forEach(function(row) {
+            var desSel = row.querySelector('.user-des-select');
+            if (!desSel || desSel.disabled) return;
+            var userId = desSel.dataset.userid;
+            var des = desSel.value;
+            var client = row.querySelector('.user-client-select').value;
+            var role = row.querySelector('.user-role-select').value;
+            var status = row.querySelector('.user-status-select').value;
+
+            google.script.run.updateUserDesignation(State.token, userId, des);
+            google.script.run.updateUserClient(State.token, userId, client);
+            google.script.run.updateUserRole(State.token, userId, role);
+            google.script.run
+                .withSuccessHandler(function() {
+                    count++;
+                    if (count >= total - 1) {
+                        showToast('✓ All user changes saved');
+                        Admin.loadUsers();
+                    }
+                })
+                .updateUserStatus(State.token, userId, status);
+        });
+    },
+
+    loadManagerAccess: function() {
+        var managerId = document.getElementById('access_manager').value;
+        State.accessManagerId = managerId;
+        var grid = document.getElementById('accessGrid');
+
+        if (!managerId) {
+            grid.innerHTML = '<div class="loading-row">Select a manager to view access</div>';
+            return;
+        }
+
+        google.script.run
+            .withSuccessHandler(function(clients) {
+                google.script.run
+                    .withSuccessHandler(function(accessClientIds) {
+                        var accessMap = {};
+                        (accessClientIds || []).forEach(function(id) { accessMap[id] = true; });
+                        grid.innerHTML = (clients || []).map(function(c) {
+                            var checked = accessMap[c.id] ? 'checked' : '';
+                            return '<div class="client-item">' +
+                                '<input type="checkbox" class="access-checkbox" data-clientid="' + c.id + '" ' + checked + '>' +
+                                '<label>' + esc(c.name) + (c.jobNumber ? ' (' + esc(c.jobNumber) + ')' : '') + '</label>' +
+                                '</div>';
+                        }).join('') || '<div class="loading-row">No clients available</div>';
+                    })
+                    .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+                    .getManagerClients(State.token, managerId);
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .getActiveClients(State.token);
+    },
+
+    refreshManagerAccess: function() {
+        Admin.loadManagerAccess();
+    },
+
+    saveManagerAccess: function() {
+        var managerId = document.getElementById('access_manager').value;
+        if (!managerId) { showToast('Please select a manager'); return; }
+
+        var checkboxes = document.querySelectorAll('.access-checkbox');
+        var selectedClientIds = [];
+        checkboxes.forEach(function(cb) {
+            if (cb.checked) selectedClientIds.push(cb.dataset.clientid);
+        });
+
+        google.script.run
+            .withSuccessHandler(function() {
+                showToast('✓ Manager client access saved');
+                Admin.loadManagerAccess();
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .batchSaveManagerClients(State.token, managerId, selectedClientIds);
+    },
+
+    loadManagerStudents: function() {
+        var managerId = document.getElementById('student_access_manager').value;
+        var grid = document.getElementById('studentAccessGrid');
+        if (!managerId) {
+            grid.innerHTML = '<div class="loading-row">Select a manager to view assigned students</div>';
+            return;
+        }
+        google.script.run
+            .withSuccessHandler(function(students) {
+                grid.innerHTML = (students || []).map(function(student) {
+                    return '<div class="client-item">' +
+                        '<input type="checkbox" class="student-access-checkbox" data-studentid="' + student.id + '" ' + (student.assigned ? 'checked' : '') + '>' +
+                        '<label>' + esc(student.name) + ' — ' + esc(student.empId) + '<br><small style="color:var(--ink-soft);">' + esc(student.clientId || 'No client') + '</small></label>' +
+                        '</div>';
+                }).join('') || '<div class="loading-row">No active students found</div>';
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .getManagerStudents(State.token, managerId);
+    },
+
+    saveManagerStudents: function() {
+        var managerId = document.getElementById('student_access_manager').value;
+        if (!managerId) { showToast('Please select a manager'); return; }
+
+        var checkboxes = document.querySelectorAll('.student-access-checkbox');
+        var selectedStudentIds = [];
+        checkboxes.forEach(function(cb) {
+            if (cb.checked) selectedStudentIds.push(cb.dataset.studentid);
+        });
+
+        google.script.run
+            .withSuccessHandler(function() {
+                showToast('✓ Student assignments saved');
+                Admin.loadManagerStudents();
+            })
+            .withFailureHandler(function(err) { showToast('✗ ' + err.message); })
+            .batchSaveManagerStudents(State.token, managerId, selectedStudentIds);
+    }
+};
+
+// ===========================================================================
+// APPLY LABELS
+// ===========================================================================
+App.applyLabels = function() {
+    var map = {
+        'ownBanner': Labels.task_title || 'MY TASKS',
+        'nearBanner': Labels.near_deadline_title || 'NEAR DEADLINE TASKS',
+        'teamBanner': Labels.manager_panel_title || 'TEAM TASKS'
+    };
+    for (var id in map) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = map[id];
+    }
+    var addBtn = document.getElementById('addTaskBtn');
+    if (addBtn) addBtn.textContent = Labels.add_task_button || '+ Add Task';
+    var logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.textContent = Labels.logout_button || 'Logout';
+
+    if (Labels.particular_label) {
+        var thP = document.getElementById('th_own_particular');
+        if (thP) thP.textContent = Labels.particular_label;
+    }
+    if (Labels.addedby_label) {
+        var thA = document.getElementById('th_own_addedby');
+        if (thA) thA.textContent = Labels.addedby_label;
+    }
+    if (Labels.remarks_label) {
+        var thR = document.getElementById('th_own_remarks');
+        if (thR) thR.textContent = Labels.remarks_label;
+    }
+    if (Labels.management_comment_label) {
+        var thC = document.getElementById('th_own_comment');
+        if (thC) thC.textContent = Labels.management_comment_label;
+    }
+};
+
+// ===========================================================================
+// BOOT
+// ===========================================================================
+document.getElementById('dateLine').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+
+(function boot() {
+    var saved = localStorage.getItem('acnabin_session_token');
+    if (saved) {
+        google.script.run
+            .withSuccessHandler(function(result) {
+                if (result && result.valid) {
+                    State.token = saved;
+                    State.user = result.user;
+                    App.enterApp();
+                } else {
+                    localStorage.removeItem('acnabin_session_token');
+                    if (RESET_TOKEN) Router.go('reset');
+                    else Router.go('welcome');
+                }
+            })
+            .withFailureHandler(function() {
+                localStorage.removeItem('acnabin_session_token');
+                if (RESET_TOKEN) Router.go('reset');
+                else Router.go('welcome');
+            })
+            .validateSession(saved);
+        return;
+    }
+    if (RESET_TOKEN) Router.go('reset');
+    else Router.go('welcome');
+})();
+</script>
+</body>
+</html>

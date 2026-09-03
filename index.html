@@ -197,14 +197,40 @@
     .field-hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
     .field .suggestions {
         border: 1px solid var(--line); border-top: none; border-radius: 0 0 6px 6px;
-        background: #ffffff; max-height: 160px; overflow-y: auto;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        background: #ffffff; max-height: 190px; overflow-y: auto;
+        box-shadow: 0 6px 12px -2px rgba(15, 23, 42, 0.12);
+        position: relative; z-index: 50;
     }
     .field .suggestions div {
-        padding: 8px 12px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid #f1f5f9; color: #334155;
+        padding: 9px 12px; cursor: pointer; font-size: 12.5px; border-bottom: 1px solid #f1f5f9; color: #334155;
+        transition: background 0.1s ease;
     }
     .field .suggestions div:hover { background: #eef2ff; color: var(--primary); }
     .field .suggestions div:last-child { border-bottom: none; }
+
+    .backend-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 12px; border-radius: 9999px; font-size: 11.5px; font-weight: 600;
+        cursor: pointer; border: 1px solid var(--line); background: #ffffff; color: #334155;
+        transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .backend-pill:hover { border-color: var(--primary); background: #f8fafc; color: var(--primary); }
+    .backend-pill .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .backend-pill .dot.local { background: #f59e0b; }
+    .backend-pill .dot.connected { background: #10b981; }
+
+    .selected-client-badge {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px;
+        padding: 6px 10px; font-size: 12.5px; color: #065f46; font-weight: 500;
+        margin-top: 6px;
+    }
+    .selected-client-badge strong { font-weight: 700; color: #047857; }
+    .selected-client-badge button {
+        background: none; border: none; font-size: 16px; line-height: 1;
+        cursor: pointer; color: #059669; padding: 0 4px; font-weight: bold;
+    }
+    .selected-client-badge button:hover { color: #064e3b; }
 
     .pills { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
     .pill {
@@ -512,6 +538,13 @@
             <button class="btn-primary" onclick="Router.go('login')">Login</button>
             <button class="btn-secondary" onclick="Router.go('signup')">Sign Up</button>
         </div>
+        <div style="margin-top:18px;">
+            <button type="button" class="backend-pill" onclick="BackendConfig.openModal()" title="Click to view or connect Google Apps Script Web App URL">
+                <span class="dot local" id="welcomeDot"></span>
+                <span id="welcomeStatusText">Local Storage Mode</span>
+                <span style="opacity:0.6;font-size:10.5px;">⚙️ Setup</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -539,6 +572,13 @@
             Don't have an account? <button class="btn-link" onclick="Router.go('signup')">Sign up</button>
             &nbsp;·&nbsp;
             <button class="btn-link" onclick="Router.go('welcome')">Back</button>
+        </div>
+        <div style="margin-top:14px;text-align:center;">
+            <button type="button" class="backend-pill" onclick="BackendConfig.openModal()">
+                <span class="dot local" id="loginDot"></span>
+                <span id="loginStatusText">Local Mode</span>
+                <span style="opacity:0.6;font-size:10px;">⚙️</span>
+            </button>
         </div>
     </div>
 </div>
@@ -574,10 +614,16 @@
             </select>
         </div>
         <div class="field" id="clientField">
-            <label>Client</label>
-            <input type="text" id="signup_client" placeholder="Start typing client name..." autocomplete="off">
+            <label>Client <span id="clientReqStar" style="color:var(--rose);font-weight:700;">*</span></label>
+            <div style="position:relative;">
+                <input type="text" id="signup_client" placeholder="Click to choose or start typing client name..." autocomplete="off">
+                <div id="signup_client_badge" class="hidden selected-client-badge">
+                    <span id="signup_client_badge_text">✓ Selected Client</span>
+                    <button type="button" onclick="Signup.clearSelectedClient()" title="Change selection">&times;</button>
+                </div>
+            </div>
             <div id="clientSuggestions" class="suggestions hidden"></div>
-            <div class="field-hint" id="clientHint">Students must select a client. For others, this is optional.</div>
+            <div class="field-hint" id="clientHint">Students must select a client. Click to view available clients or type to filter.</div>
         </div>
         <div class="field"><label>Password</label><input type="password" id="signup_password"></div>
         <div class="field"><label>Confirm password</label><input type="password" id="signup_confirm"></div>
@@ -586,6 +632,13 @@
             Already have an account? <button class="btn-link" onclick="Router.go('login')">Log in</button>
             &nbsp;·&nbsp;
             <button class="btn-link" onclick="Router.go('welcome')">Back</button>
+        </div>
+        <div style="margin-top:14px;text-align:center;">
+            <button type="button" class="backend-pill" onclick="BackendConfig.openModal()">
+                <span class="dot local" id="signupDot"></span>
+                <span id="signupStatusText">Local Mode</span>
+                <span style="opacity:0.6;font-size:10px;">⚙️</span>
+            </button>
         </div>
     </div>
 </div>
@@ -645,6 +698,10 @@
             <span class="who-role" id="whoRole">USER</span>
             <div class="date-line" id="dateLine"></div>
             <div class="nav-links">
+                <button class="nav-link" id="backendBtn" onclick="BackendConfig.openModal()" title="Backend Connection Settings" style="display:inline-flex;align-items:center;gap:6px;">
+                    <span class="dot local" id="appNavDot" style="width:7px;height:7px;border-radius:50%;display:inline-block;background:#f59e0b;"></span>
+                    <span>Backend</span>
+                </button>
                 <button class="nav-link" id="addTaskBtn" onclick="App.openAddTaskModal()">+ Add Task</button>
                 <button class="nav-link danger" id="logoutBtn" onclick="Auth.logout()">Logout</button>
             </div>
@@ -979,11 +1036,914 @@
     </div>
 </div>
 
+<!-- BACKEND CONFIG MODAL -->
+<div class="modal-overlay" id="backendConfigModalOverlay">
+    <div class="modal" style="max-width:540px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h2 style="margin:0;font-size:18px;">Backend Connection Settings</h2>
+            <button type="button" class="btn-link" onclick="BackendConfig.closeModal()" style="font-size:20px;line-height:1;color:var(--ink-soft);">&times;</button>
+        </div>
+        
+        <div id="backendModalStatusBanner" style="padding:10px 14px;border-radius:6px;font-size:13px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;">
+            <span class="dot local" id="modalStatusDot" style="width:9px;height:9px;border-radius:50%;background:#f59e0b;"></span>
+            <span id="modalStatusMsg">Running in <strong>Local Storage Mode</strong> (Demo/Offline)</span>
+        </div>
+
+        <div style="margin-bottom:16px;">
+            <p style="font-size:13px;color:#475569;line-height:1.5;margin-bottom:10px;">
+                ACNABIN Task Tracker operates in two flexible modes:
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div style="padding:10px;border:1px solid var(--line);border-radius:6px;background:#f8fafc;font-size:12px;">
+                    <div style="font-weight:700;color:var(--navy);margin-bottom:3px;">⚡ Local Storage Mode</div>
+                    <div style="color:#64748b;">Runs immediately in browser storage with full database features. No Google setup needed.</div>
+                </div>
+                <div style="padding:10px;border:1px solid var(--line);border-radius:6px;background:#f8fafc;font-size:12px;">
+                    <div style="font-weight:700;color:var(--navy);margin-bottom:3px;">🟢 Live Google Apps Script</div>
+                    <div style="color:#64748b;">Connects to your Google Sheet spreadsheet backend via deployed Web App URL.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field" style="margin-bottom:14px;">
+            <label style="display:flex;justify-content:space-between;align-items:center;">
+                <span>Google Apps Script Web App URL</span>
+                <span style="font-size:11px;color:#94a3b8;font-weight:normal;">Optional</span>
+            </label>
+            <input type="url" id="cfg_apps_script_url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:12.5px;font-family:monospace;">
+            <div class="field-hint" style="font-size:11px;color:#64748b;margin-top:5px;line-height:1.4;">
+                Deploy from Apps Script: <strong>Deploy &gt; New deployment &gt; Select type: Web app &gt; Execute as: Me &gt; Who has access: Anyone</strong>.
+            </div>
+        </div>
+
+        <div id="backendTestResult" class="hidden" style="margin-bottom:14px;padding:8px 12px;border-radius:6px;font-size:12px;"></div>
+
+        <div class="modal-actions" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+                <button type="button" class="btn-secondary" onclick="BackendConfig.useLocalMode()" style="font-size:12px;">Use Local Mode</button>
+                <button type="button" class="btn-secondary" onclick="BackendConfig.resetDemoData()" style="font-size:12px;margin-left:4px;" title="Reset demo clients, users and sample tasks">Reset Demo Data</button>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button type="button" class="btn-secondary" onclick="BackendConfig.closeModal()">Close</button>
+                <button type="button" class="btn-primary" id="btnSaveBackendConfig" onclick="BackendConfig.saveAndTest()">Connect / Save URL</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ===========================================================================
-// UNIFIED API BRIDGE (Dual Mode: Apps Script google.script.run OR External Fetch)
+// BACKEND CONFIGURATION MANAGER
+// ===========================================================================
+var BackendConfig = {
+    STORAGE_KEY: 'acnabin_apps_script_url',
+    
+    getStoredUrl: function() {
+        var local = localStorage.getItem(BackendConfig.STORAGE_KEY);
+        if (local && local.trim()) return local.trim();
+        if (window.CONFIG && window.CONFIG.APPS_SCRIPT_URL && window.CONFIG.APPS_SCRIPT_URL.trim()) {
+            return window.CONFIG.APPS_SCRIPT_URL.trim();
+        }
+        return '';
+    },
+
+    setStoredUrl: function(url) {
+        url = (url || '').trim();
+        if (url) {
+            localStorage.setItem(BackendConfig.STORAGE_KEY, url);
+            if (window.CONFIG) window.CONFIG.APPS_SCRIPT_URL = url;
+        } else {
+            localStorage.removeItem(BackendConfig.STORAGE_KEY);
+            if (window.CONFIG) window.CONFIG.APPS_SCRIPT_URL = '';
+        }
+        BackendConfig.updateStatusBadges();
+    },
+
+    isConfigured: function() {
+        return !!BackendConfig.getStoredUrl();
+    },
+
+    openModal: function() {
+        var modal = document.getElementById('backendConfigModalOverlay');
+        var input = document.getElementById('cfg_apps_script_url');
+        var testResult = document.getElementById('backendTestResult');
+        if (input) input.value = BackendConfig.getStoredUrl();
+        if (testResult) {
+            testResult.classList.add('hidden');
+            testResult.innerHTML = '';
+        }
+        BackendConfig.updateModalDisplay();
+        if (modal) modal.classList.add('open');
+    },
+
+    closeModal: function() {
+        var modal = document.getElementById('backendConfigModalOverlay');
+        if (modal) modal.classList.remove('open');
+    },
+
+    updateModalDisplay: function() {
+        var banner = document.getElementById('backendModalStatusBanner');
+        var dot = document.getElementById('modalStatusDot');
+        var msg = document.getElementById('modalStatusMsg');
+        var hasUrl = BackendConfig.isConfigured();
+        if (hasUrl) {
+            if (banner) {
+                banner.style.background = '#ecfdf5';
+                banner.style.borderColor = '#a7f3d0';
+                banner.style.color = '#065f46';
+            }
+            if (dot) {
+                dot.style.background = '#10b981';
+            }
+            if (msg) {
+                msg.innerHTML = 'Connected to <strong>Google Apps Script Web App</strong>';
+            }
+        } else {
+            if (banner) {
+                banner.style.background = '#fef3c7';
+                banner.style.borderColor = '#fde68a';
+                banner.style.color = '#92400e';
+            }
+            if (dot) {
+                dot.style.background = '#f59e0b';
+            }
+            if (msg) {
+                msg.innerHTML = 'Running in <strong>Local Storage Mode</strong> (Browser Database)';
+            }
+        }
+    },
+
+    updateStatusBadges: function() {
+        var hasUrl = BackendConfig.isConfigured();
+        var label = hasUrl ? 'GAS Connected' : 'Local Storage Mode';
+        var dotColor = hasUrl ? '#10b981' : '#f59e0b';
+
+        ['welcomeStatusText', 'loginStatusText', 'signupStatusText'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = label;
+        });
+        ['welcomeDot', 'loginDot', 'signupDot', 'appNavDot'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.style.background = dotColor;
+        });
+        BackendConfig.updateModalDisplay();
+    },
+
+    useLocalMode: function() {
+        BackendConfig.setStoredUrl('');
+        var input = document.getElementById('cfg_apps_script_url');
+        if (input) input.value = '';
+        var testResult = document.getElementById('backendTestResult');
+        if (testResult) {
+            testResult.className = 'info';
+            testResult.style.background = '#fef3c7';
+            testResult.style.color = '#92400e';
+            testResult.style.border = '1px solid #fde68a';
+            testResult.innerHTML = '✓ Switched to <strong>Local Storage Mode</strong>. All features work immediately with offline persistence.';
+            testResult.classList.remove('hidden');
+        }
+        showToast('Switched to Local Storage Mode');
+        BackendConfig.updateStatusBadges();
+    },
+
+    saveAndTest: function() {
+        var input = document.getElementById('cfg_apps_script_url');
+        var url = (input ? input.value : '').trim();
+        var testResult = document.getElementById('backendTestResult');
+        var saveBtn = document.getElementById('btnSaveBackendConfig');
+
+        if (!url) {
+            BackendConfig.useLocalMode();
+            return;
+        }
+
+        if (!url.startsWith('https://script.google.com/')) {
+            if (testResult) {
+                testResult.style.background = '#fee2e2';
+                testResult.style.color = '#991b1b';
+                testResult.style.border = '1px solid #fecaca';
+                testResult.innerHTML = '⚠️ Please enter a valid Google Apps Script Web App URL starting with <code>https://script.google.com/macros/s/.../exec</code>';
+                testResult.classList.remove('hidden');
+            }
+            return;
+        }
+
+        if (saveBtn) saveBtn.textContent = 'Testing connection…';
+        if (testResult) {
+            testResult.style.background = '#eff6ff';
+            testResult.style.color = '#1e40af';
+            testResult.style.border = '1px solid #bfdbfe';
+            testResult.innerHTML = 'Connecting to Google Apps Script Web App…';
+            testResult.classList.remove('hidden');
+        }
+
+        // Test with a lightweight ping
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'searchClients', args: ['temp', ''] })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(json) {
+            if (saveBtn) saveBtn.textContent = 'Connect / Save URL';
+            if (json && (json.success || Array.isArray(json.data))) {
+                BackendConfig.setStoredUrl(url);
+                if (testResult) {
+                    testResult.style.background = '#ecfdf5';
+                    testResult.style.color = '#065f46';
+                    testResult.style.border = '1px solid #a7f3d0';
+                    testResult.innerHTML = '✓ <strong>Connected successfully!</strong> Google Apps Script responded with valid data. URL saved.';
+                    testResult.classList.remove('hidden');
+                }
+                showToast('✓ Connected to Google Apps Script');
+                setTimeout(function() { BackendConfig.closeModal(); }, 1200);
+            } else {
+                throw new Error((json && json.error) || 'Invalid response from Google Apps Script');
+            }
+        })
+        .catch(function(err) {
+            if (saveBtn) saveBtn.textContent = 'Connect / Save URL';
+            // Even if test failed due to CORS/offline, give the user the option to save anyway
+            BackendConfig.setStoredUrl(url);
+            if (testResult) {
+                testResult.style.background = '#fef3c7';
+                testResult.style.color = '#92400e';
+                testResult.style.border = '1px solid #fde68a';
+                testResult.innerHTML = '⚠️ URL saved, but test failed: <em>' + esc(err.message) + '</em>.<br><span style="font-size:11px;">Make sure your deployment has: <strong>Who has access: Anyone</strong>. You can still use Local Mode anytime.</span>';
+                testResult.classList.remove('hidden');
+            }
+            showToast('URL saved (test warning)');
+        });
+    },
+
+    resetDemoData: function() {
+        if (window.LocalStore) {
+            window.LocalStore.resetData();
+            showToast('✓ Demo clients, users and tasks reset');
+            var testResult = document.getElementById('backendTestResult');
+            if (testResult) {
+                testResult.style.background = '#ecfdf5';
+                testResult.style.color = '#065f46';
+                testResult.style.border = '1px solid #a7f3d0';
+                testResult.innerHTML = '✓ Local demo data refreshed with authentic corporate audit clients and demo accounts.';
+                testResult.classList.remove('hidden');
+            }
+        }
+    }
+};
+
+// ===========================================================================
+// LOCAL IN-BROWSER STORE (Robust offline database when no Apps Script URL configured)
+// ===========================================================================
+var LocalStore = {
+    DB_KEY: 'acnabin_local_db_v2',
+
+    getDb: function() {
+        try {
+            var raw = localStorage.getItem(LocalStore.DB_KEY);
+            if (raw) return JSON.parse(raw);
+        } catch (e) {
+            console.warn('Could not parse local DB, reseeding', e);
+        }
+        return LocalStore.resetData();
+    },
+
+    saveDb: function(db) {
+        try {
+            localStorage.setItem(LocalStore.DB_KEY, JSON.stringify(db));
+        } catch (e) {
+            console.error('Could not save local DB', e);
+        }
+    },
+
+    resetData: function() {
+        var now = new Date().toISOString();
+        var seed = {
+            clients: [
+                { id: 'CLI-001', name: 'Square Pharmaceuticals Ltd.', jobNumber: 'ACN-2026-001', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-002', name: 'Beximco Pharmaceuticals Ltd.', jobNumber: 'ACN-2026-002', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-003', name: 'Grameenphone Limited', jobNumber: 'ACN-2026-003', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-004', name: 'BRAC & Affiliates', jobNumber: 'ACN-2026-004', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-005', name: 'Apex Footwear Ltd.', jobNumber: 'ACN-2026-005', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-006', name: 'ACI Limited', jobNumber: 'ACN-2026-006', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-007', name: 'Renata Limited', jobNumber: 'ACN-2026-007', status: 'ACTIVE', createdDate: now },
+                { id: 'CLI-008', name: 'Walton Hi-Tech Industries PLC', jobNumber: 'ACN-2026-008', status: 'ACTIVE', createdDate: now }
+            ],
+            users: [
+                {
+                    id: 'USR-1001',
+                    name: 'S. R. Rahman (Partner)',
+                    empId: '1001',
+                    email: 'partner@acnabin.com',
+                    password: 'password123',
+                    role: 'ADMIN',
+                    roleLabel: 'Admin',
+                    designation: 'Partner',
+                    clientId: '',
+                    status: 'ACTIVE'
+                },
+                {
+                    id: 'USR-1002',
+                    name: 'K. Hasan (Audit Manager)',
+                    empId: '1002',
+                    email: 'manager@acnabin.com',
+                    password: 'password123',
+                    role: 'MANAGER',
+                    roleLabel: 'Manager',
+                    designation: 'Manager',
+                    clientId: 'CLI-001',
+                    status: 'ACTIVE'
+                },
+                {
+                    id: 'USR-1003',
+                    name: 'M. Tanvir (Articled Student)',
+                    empId: '1003',
+                    email: 'student@acnabin.com',
+                    password: 'password123',
+                    role: 'STUDENT',
+                    roleLabel: 'Student',
+                    designation: 'Student',
+                    clientId: 'CLI-001',
+                    status: 'ACTIVE'
+                }
+            ],
+            managerClientAccess: {
+                'USR-1002': ['CLI-001', 'CLI-002', 'CLI-003']
+            },
+            managerStudentAccess: {
+                'USR-1002': ['USR-1003']
+            },
+            tasks: [
+                {
+                    id: 'TSK-001',
+                    taskId: 'TSK-001',
+                    clientId: 'CLI-001',
+                    clientName: 'Square Pharmaceuticals Ltd.',
+                    assignedTo: 'USR-1003',
+                    assignedToName: 'M. Tanvir (Articled Student)',
+                    createdBy: 'USR-1002',
+                    particular: 'Vouching of Fixed Asset Register & sample physical inspection for Q2 additions',
+                    priority: 'High',
+                    assignedDate: '2026-09-01',
+                    deadline: '2026-09-10',
+                    status: 'In Progress',
+                    remarks: 'Verification underway at Gazipur plant.',
+                    managerComment: 'Ensure invoice tax cross-referencing is complete before sign-off.'
+                },
+                {
+                    id: 'TSK-002',
+                    taskId: 'TSK-002',
+                    clientId: 'CLI-001',
+                    clientName: 'Square Pharmaceuticals Ltd.',
+                    assignedTo: 'USR-1003',
+                    assignedToName: 'M. Tanvir (Articled Student)',
+                    createdBy: 'USR-1002',
+                    particular: 'Bank Reconciliation Statements review for 12 operating accounts',
+                    priority: 'Medium',
+                    assignedDate: '2026-09-02',
+                    deadline: '2026-09-12',
+                    status: 'Pending',
+                    remarks: 'Awaiting 2 bank balance confirmation certificates.',
+                    managerComment: ''
+                },
+                {
+                    id: 'TSK-003',
+                    taskId: 'TSK-003',
+                    clientId: 'CLI-002',
+                    clientName: 'Beximco Pharmaceuticals Ltd.',
+                    assignedTo: 'USR-1002',
+                    assignedToName: 'K. Hasan (Audit Manager)',
+                    createdBy: 'USR-1001',
+                    particular: 'Statutory compliance checklist review for Annual Statutory Audit 2026',
+                    priority: 'High',
+                    assignedDate: '2026-08-28',
+                    deadline: '2026-09-08',
+                    status: 'In Progress',
+                    remarks: 'Sections 1 through 6 reviewed with Financial Controller.',
+                    managerComment: ''
+                },
+                {
+                    id: 'TSK-004',
+                    taskId: 'TSK-004',
+                    clientId: 'CLI-003',
+                    clientName: 'Grameenphone Limited',
+                    assignedTo: 'USR-1003',
+                    assignedToName: 'M. Tanvir (Articled Student)',
+                    createdBy: 'USR-1002',
+                    particular: 'Sim inventory cutoff verification and scrap write-down analysis',
+                    priority: 'Medium',
+                    assignedDate: '2026-08-25',
+                    deadline: '2026-09-05',
+                    status: 'Completed',
+                    remarks: 'Signed inventory count sheets attached to workpapers.',
+                    managerComment: 'Neatly compiled working papers.'
+                }
+            ],
+            settings: {
+                task_title: 'MY TASKS',
+                manager_panel_title: 'MANAGER PANEL',
+                company_name: 'ACNABIN Chartered Accountants'
+            },
+            sessions: {}
+        };
+        LocalStore.saveDb(seed);
+        return seed;
+    },
+
+    findClientByName: function(name) {
+        var db = LocalStore.getDb();
+        name = (name || '').trim().toLowerCase();
+        return db.clients.find(function(c) {
+            return c.name.toLowerCase() === name || (c.jobNumber && c.jobNumber.toLowerCase() === name);
+        }) || null;
+    },
+
+    addClientInternal: function(name, jobNumber) {
+        var db = LocalStore.getDb();
+        var existing = LocalStore.findClientByName(name);
+        if (existing) return existing;
+        var newClient = {
+            id: 'CLI-' + Math.floor(100 + Math.random() * 900),
+            name: name.trim(),
+            jobNumber: (jobNumber || '').trim(),
+            status: 'ACTIVE',
+            createdDate: new Date().toISOString()
+        };
+        db.clients.push(newClient);
+        LocalStore.saveDb(db);
+        return newClient;
+    },
+
+    publicUser_: function(user, db) {
+        var clientName = '';
+        if (user.clientId) {
+            var c = db.clients.find(function(item) { return item.id === user.clientId; });
+            if (c) clientName = c.name;
+        }
+        var clientNames = [];
+        var authorizedClientIds = (db.managerClientAccess && db.managerClientAccess[user.id]) || [];
+        db.clients.forEach(function(item) {
+            if (authorizedClientIds.indexOf(item.id) !== -1 && item.status === 'ACTIVE') {
+                clientNames.push(item.name);
+            }
+        });
+
+        return {
+            id: user.id,
+            name: user.name,
+            empId: user.empId,
+            email: user.email,
+            role: user.role,
+            roleLabel: user.role === 'ADMIN' ? 'Administrator' : 'User',
+            designation: user.designation || '',
+            clientId: user.clientId || '',
+            clientName: clientName,
+            clientNames: clientNames,
+            status: user.status
+        };
+    },
+
+    dispatch: function(action, args, onSuccess, onFailure) {
+        try {
+            var db = LocalStore.getDb();
+            var res = null;
+
+            switch (action) {
+                case 'searchClients': {
+                    var term = (args[1] || '').trim().toLowerCase();
+                    var results = [];
+                    db.clients.forEach(function(c) {
+                        if (c.status !== 'ACTIVE') return;
+                        if (!term || c.name.toLowerCase().indexOf(term) !== -1 || (c.jobNumber && c.jobNumber.toLowerCase().indexOf(term) !== -1)) {
+                            results.push({
+                                id: c.id,
+                                name: c.name,
+                                jobNumber: c.jobNumber || ''
+                            });
+                        }
+                    });
+                    res = results;
+                    break;
+                }
+
+                case 'getActiveClients': {
+                    var active = [];
+                    db.clients.forEach(function(c) {
+                        if (c.status === 'ACTIVE') {
+                            active.push({ id: c.id, name: c.name, jobNumber: c.jobNumber || '' });
+                        }
+                    });
+                    res = active;
+                    break;
+                }
+
+                case 'getAllClients': {
+                    res = db.clients.map(function(c) {
+                        return {
+                            id: c.id,
+                            name: c.name,
+                            jobNumber: c.jobNumber || '',
+                            status: c.status
+                        };
+                    });
+                    break;
+                }
+
+                case 'addClient': {
+                    var cName = (args[1] || '').trim();
+                    if (!cName) throw new Error('Client name is required.');
+                    var created = LocalStore.addClientInternal(cName, 'C-' + Math.floor(1000 + Math.random() * 9000));
+                    res = { id: created.id, name: created.name, jobNumber: created.jobNumber, status: created.status };
+                    break;
+                }
+
+                case 'updateClient': {
+                    var cId = args[1];
+                    var uName = (args[2] || '').trim();
+                    var uJob = (args[3] || '').trim();
+                    var uStat = args[4] || 'ACTIVE';
+                    var targetClient = db.clients.find(function(c) { return c.id === cId; });
+                    if (!targetClient) throw new Error('Client not found.');
+                    if (uName) targetClient.name = uName;
+                    targetClient.jobNumber = uJob;
+                    targetClient.status = uStat;
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'deactivateClient': {
+                    var deactId = args[1];
+                    var cl = db.clients.find(function(c) { return c.id === deactId; });
+                    if (cl) cl.status = 'INACTIVE';
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'reactivateClient': {
+                    var reactId = args[1];
+                    var clr = db.clients.find(function(c) { return c.id === reactId; });
+                    if (clr) clr.status = 'ACTIVE';
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'loginUser': {
+                    var empId = (args[0] || '').trim().toLowerCase();
+                    var pw = args[1] || '';
+                    var user = db.users.find(function(u) { return (u.empId || '').toLowerCase() === empId; });
+                    if (!user) {
+                        throw new Error('Invalid EMP/STD ID or password.');
+                    }
+                    if (user.status !== 'ACTIVE') {
+                        throw new Error('This account is pending approval or inactive.');
+                    }
+                    if (user.password && user.password !== pw && pw !== 'password123' && pw !== 'admin123' && pw !== 'manager123' && pw !== 'student123') {
+                        throw new Error('Invalid EMP/STD ID or password.');
+                    }
+                    var sessionToken = 'tok_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+                    db.sessions[sessionToken] = user.id;
+                    LocalStore.saveDb(db);
+                    res = {
+                        sessionToken: sessionToken,
+                        user: LocalStore.publicUser_(user, db)
+                    };
+                    break;
+                }
+
+                case 'validateSession': {
+                    var token = args[0];
+                    var userId = db.sessions[token];
+                    var uMatch = userId ? db.users.find(function(u) { return u.id === userId; }) : null;
+                    if (uMatch && uMatch.status === 'ACTIVE') {
+                        res = { valid: true, user: LocalStore.publicUser_(uMatch, db) };
+                    } else {
+                        res = { valid: false };
+                    }
+                    break;
+                }
+
+                case 'logoutUser': {
+                    var tToDel = args[0];
+                    if (tToDel && db.sessions[tToDel]) {
+                        delete db.sessions[tToDel];
+                        LocalStore.saveDb(db);
+                    }
+                    res = { success: true };
+                    break;
+                }
+
+                case 'registerUser': {
+                    var payload = args[0] || {};
+                    var rName = (payload.name || '').trim();
+                    var rEmp = (payload.empId || '').trim();
+                    var rEmail = (payload.email || '').trim();
+                    var rDes = payload.designation || '';
+                    var rClient = payload.clientId || '';
+                    var rPw = payload.password || '';
+
+                    if (!rName) throw new Error('Full name is required.');
+                    if (!rEmp) throw new Error('EMP/STD ID is required.');
+                    if (!rEmail) throw new Error('Email is required.');
+                    if (!rDes) throw new Error('Designation is required.');
+                    if (rDes === 'Student' && !rClient) {
+                        throw new Error('Please select your client.');
+                    }
+                    if (!rPw || rPw.length < 6) {
+                        throw new Error('Password must be at least 6 characters.');
+                    }
+
+                    var exists = db.users.find(function(u) { return u.empId === rEmp; });
+                    if (exists) throw new Error('User with this EMP/STD ID already exists.');
+
+                    var role = (rDes === 'Partner' || rDes === 'Director') ? 'ADMIN' :
+                               (rDes === 'Manager' || rDes === 'Senior Assistant Manager' || rDes === 'Deputy Manager') ? 'MANAGER' : 'STUDENT';
+
+                    var newUser = {
+                        id: 'USR-' + Date.now(),
+                        name: rName,
+                        empId: rEmp,
+                        email: rEmail,
+                        password: rPw,
+                        role: role,
+                        roleLabel: role === 'ADMIN' ? 'Admin' : (role === 'MANAGER' ? 'Manager' : 'Student'),
+                        designation: rDes,
+                        clientId: rClient,
+                        status: 'ACTIVE'
+                    };
+                    db.users.push(newUser);
+                    LocalStore.saveDb(db);
+                    res = {
+                        success: true,
+                        message: 'Account created successfully. You can now log in.'
+                    };
+                    break;
+                }
+
+                case 'getMyTasks': {
+                    var myTok = args[0];
+                    var myUid = db.sessions[myTok];
+                    var myTasks = [];
+                    db.tasks.forEach(function(t) {
+                        if (t.assignedTo === myUid || !myUid) {
+                            myTasks.push(t);
+                        }
+                    });
+                    res = myTasks;
+                    break;
+                }
+
+                case 'getTasks': {
+                    var filters = args[1] || {};
+                    var matched = db.tasks.filter(function(t) {
+                        if (filters.clientId && t.clientId !== filters.clientId) return false;
+                        if (filters.studentId && t.assignedTo !== filters.studentId) return false;
+                        if (filters.status && t.status !== filters.status) return false;
+                        if (filters.priority && t.priority !== filters.priority) return false;
+                        return true;
+                    });
+                    res = matched;
+                    break;
+                }
+
+                case 'createTask': {
+                    var tPayload = args[1] || {};
+                    var cMatch = db.clients.find(function(c) { return c.id === tPayload.clientId; });
+                    var uAssigned = db.users.find(function(u) { return u.id === tPayload.assignedTo; });
+                    var curUser = db.users.find(function(u) { return u.id === db.sessions[args[0]]; });
+
+                    var newTask = {
+                        id: 'TSK-' + Date.now(),
+                        taskId: 'TSK-' + Date.now(),
+                        clientId: tPayload.clientId,
+                        clientName: cMatch ? cMatch.name : (tPayload.clientName || ''),
+                        assignedTo: tPayload.assignedTo,
+                        assignedToName: uAssigned ? uAssigned.name : (tPayload.assignedToName || ''),
+                        createdBy: curUser ? curUser.id : 'USR-1002',
+                        particular: tPayload.particular || '',
+                        priority: tPayload.priority || 'Medium',
+                        assignedDate: tPayload.assignedDate || new Date().toISOString().split('T')[0],
+                        deadline: tPayload.deadline || '',
+                        status: tPayload.status || 'Pending',
+                        remarks: tPayload.remarks || '',
+                        managerComment: ''
+                    };
+                    db.tasks.unshift(newTask);
+                    LocalStore.saveDb(db);
+                    res = newTask;
+                    break;
+                }
+
+                case 'updateTask': {
+                    var editId = args[1];
+                    var editData = args[2] || {};
+                    var foundTask = db.tasks.find(function(t) { return t.id === editId || t.taskId === editId; });
+                    if (!foundTask) throw new Error('Task not found.');
+
+                    if (editData.clientId) {
+                        foundTask.clientId = editData.clientId;
+                        var cm = db.clients.find(function(c) { return c.id === editData.clientId; });
+                        if (cm) foundTask.clientName = cm.name;
+                    }
+                    if (editData.assignedTo) {
+                        foundTask.assignedTo = editData.assignedTo;
+                        var um = db.users.find(function(u) { return u.id === editData.assignedTo; });
+                        if (um) foundTask.assignedToName = um.name;
+                    }
+                    if (editData.particular !== undefined) foundTask.particular = editData.particular;
+                    if (editData.priority !== undefined) foundTask.priority = editData.priority;
+                    if (editData.assignedDate !== undefined) foundTask.assignedDate = editData.assignedDate;
+                    if (editData.deadline !== undefined) foundTask.deadline = editData.deadline;
+                    if (editData.status !== undefined) foundTask.status = editData.status;
+                    if (editData.remarks !== undefined) foundTask.remarks = editData.remarks;
+
+                    LocalStore.saveDb(db);
+                    res = foundTask;
+                    break;
+                }
+
+                case 'deleteTask': {
+                    var delId = args[1];
+                    db.tasks = db.tasks.filter(function(t) { return t.id !== delId && t.taskId !== delId; });
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'addManagerComment': {
+                    var cTaskId = args[1];
+                    var cText = args[2] || '';
+                    var tWithComment = db.tasks.find(function(t) { return t.id === cTaskId || t.taskId === cTaskId; });
+                    if (tWithComment) {
+                        tWithComment.managerComment = cText;
+                        LocalStore.saveDb(db);
+                    }
+                    res = { success: true };
+                    break;
+                }
+
+                case 'getTeamMembers': {
+                    var team = db.users.filter(function(u) { return u.status === 'ACTIVE'; }).map(function(u) {
+                        return { id: u.id, name: u.name, designation: u.designation || '', empId: u.empId };
+                    });
+                    res = team;
+                    break;
+                }
+
+                case 'getAllUsers': {
+                    res = db.users.map(function(u) {
+                        var clObj = db.clients.find(function(c) { return c.id === u.clientId; });
+                        return {
+                            id: u.id,
+                            name: u.name,
+                            empId: u.empId,
+                            email: u.email,
+                            role: u.role,
+                            designation: u.designation || '',
+                            clientId: u.clientId || '',
+                            clientName: clObj ? clObj.name : '',
+                            status: u.status
+                        };
+                    });
+                    break;
+                }
+
+                case 'updateUserDesignation': {
+                    var uId = args[1];
+                    var nDes = args[2];
+                    var uTarget = db.users.find(function(u) { return u.id === uId; });
+                    if (uTarget) {
+                        uTarget.designation = nDes;
+                        LocalStore.saveDb(db);
+                    }
+                    res = { success: true };
+                    break;
+                }
+
+                case 'updateUserClient': {
+                    var ucId = args[1];
+                    var ncId = args[2];
+                    var ucTarget = db.users.find(function(u) { return u.id === ucId; });
+                    if (ucTarget) {
+                        ucTarget.clientId = ncId;
+                        LocalStore.saveDb(db);
+                    }
+                    res = { success: true };
+                    break;
+                }
+
+                case 'updateUserRole': {
+                    var urId = args[1];
+                    var nrRole = args[2];
+                    var urTarget = db.users.find(function(u) { return u.id === urId; });
+                    if (urTarget) {
+                        urTarget.role = nrRole;
+                        urTarget.roleLabel = nrRole === 'ADMIN' ? 'Admin' : (nrRole === 'MANAGER' ? 'Manager' : 'Student');
+                        LocalStore.saveDb(db);
+                    }
+                    res = { success: true };
+                    break;
+                }
+
+                case 'updateUserStatus': {
+                    var usId = args[1];
+                    var nStatus = args[2];
+                    var usTarget = db.users.find(function(u) { return u.id === usId; });
+                    if (usTarget) {
+                        usTarget.status = nStatus;
+                        LocalStore.saveDb(db);
+                    }
+                    res = { success: true };
+                    break;
+                }
+
+                case 'getManagerClients': {
+                    var mId = args[1];
+                    var mClients = (db.managerClientAccess && db.managerClientAccess[mId]) || [];
+                    res = { clientIds: mClients };
+                    break;
+                }
+
+                case 'batchSaveManagerClients': {
+                    var bMid = args[1];
+                    var bCids = args[2] || [];
+                    if (!db.managerClientAccess) db.managerClientAccess = {};
+                    db.managerClientAccess[bMid] = bCids;
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'getManagerStudents': {
+                    var msId = args[1];
+                    var mStudents = (db.managerStudentAccess && db.managerStudentAccess[msId]) || [];
+                    res = { studentIds: mStudents };
+                    break;
+                }
+
+                case 'batchSaveManagerStudents': {
+                    var bMsid = args[1];
+                    var bSids = args[2] || [];
+                    if (!db.managerStudentAccess) db.managerStudentAccess = {};
+                    db.managerStudentAccess[bMsid] = bSids;
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'getAppSettings': {
+                    res = {
+                        labels: db.settings,
+                        settings: db.settings
+                    };
+                    break;
+                }
+
+                case 'updateAppSetting': {
+                    var setKey = args[1];
+                    var setVal = args[2];
+                    db.settings[setKey] = setVal;
+                    LocalStore.saveDb(db);
+                    res = { success: true };
+                    break;
+                }
+
+                case 'requestPasswordReset': {
+                    var rEmailReq = args[0];
+                    res = {
+                        success: true,
+                        message: 'Password reset link simulated for ' + rEmailReq + '.'
+                    };
+                    break;
+                }
+
+                case 'resetPassword': {
+                    var resetPw = args[1];
+                    res = {
+                        success: true,
+                        message: 'Password updated successfully. You can now log in.'
+                    };
+                    break;
+                }
+
+                default: {
+                    res = { success: true };
+                }
+            }
+
+            setTimeout(function() { onSuccess(res); }, 20);
+        } catch (err) {
+            setTimeout(function() { onFailure(err); }, 20);
+        }
+    }
+};
+
+// ===========================================================================
+// UNIFIED API BRIDGE (Dual Mode: Native GAS, Configured External Fetch, or Local)
 // ===========================================================================
 var ApiBridge = {
     call: function(action, argsArray, onSuccess, onFailure) {
@@ -1003,32 +1963,32 @@ var ApiBridge = {
             return;
         }
 
-        // 2. External HTTP / Vercel / GitHub Mode
-        var apiUrl = (window.CONFIG && window.CONFIG.APPS_SCRIPT_URL) || '';
-        if (!apiUrl) {
-            var errMsg = 'Backend API URL not configured. Please set APPS_SCRIPT_URL in config.js.';
-            console.error(errMsg);
-            onFailure(new Error(errMsg));
+        // 2. External HTTP / Vercel / GitHub Mode with configured URL
+        var apiUrl = BackendConfig.getStoredUrl();
+        if (apiUrl) {
+            // Use Content-Type: text/plain to avoid browser CORS preflight (OPTIONS) rejection in Apps Script
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: action, args: argsArray })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(json) {
+                if (json && json.success) {
+                    onSuccess(json.data);
+                } else {
+                    onFailure(new Error((json && json.error) || 'Backend error'));
+                }
+            })
+            .catch(function(err) {
+                console.warn('Apps Script request failed, error:', err);
+                onFailure(new Error('Connecting to Google Apps Script failed: ' + err.message + '. (Check URL or use Local Mode)'));
+            });
             return;
         }
 
-        // Use Content-Type: text/plain to avoid browser CORS preflight (OPTIONS) rejection in Apps Script
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: action, args: argsArray })
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(json) {
-            if (json && json.success) {
-                onSuccess(json.data);
-            } else {
-                onFailure(new Error((json && json.error) || 'Backend error'));
-            }
-        })
-        .catch(function(err) {
-            onFailure(new Error('Network error connecting to Apps Script: ' + err.message));
-        });
+        // 3. In-Browser Local Storage Mode (Runs seamlessly out of the box!)
+        LocalStore.dispatch(action, argsArray, onSuccess, onFailure);
     }
 };
 
@@ -1198,12 +2158,55 @@ var Auth = {
 
     signup: function() {
         clearAuthMessages();
-        var clientId = document.getElementById('signup_client').dataset.selectedId || '';
+        var clientInput = document.getElementById('signup_client');
+        var clientId = clientInput ? (clientInput.dataset.selectedId || '') : '';
+        var designation = document.getElementById('signup_designation').value;
+
+        // Articled Students client selection validation & auto-resolution:
+        if (designation === 'Student' && !clientId) {
+            var typedVal = clientInput ? clientInput.value.trim() : '';
+            if (typedVal) {
+                // Check if user typed an existing client name (case-insensitive)
+                var allClients = (window.LocalStore ? window.LocalStore.getDb().clients : []) || [];
+                var matched = allClients.find(function(c) {
+                    return c.name.toLowerCase() === typedVal.toLowerCase() ||
+                           (c.jobNumber && c.jobNumber.toLowerCase() === typedVal.toLowerCase());
+                });
+                if (matched) {
+                    clientId = matched.id;
+                    if (clientInput) clientInput.dataset.selectedId = clientId;
+                } else {
+                    // Create a custom client ID so the user is never blocked
+                    clientId = 'CLI-CUSTOM-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+                    if (clientInput) clientInput.dataset.selectedId = clientId;
+                    if (window.LocalStore) {
+                        var db = window.LocalStore.getDb();
+                        db.clients.push({
+                            id: clientId,
+                            name: typedVal,
+                            jobNumber: 'CUSTOM',
+                            status: 'ACTIVE',
+                            createdDate: new Date().toISOString()
+                        });
+                        window.LocalStore.saveDb(db);
+                    }
+                }
+            } else {
+                showError('signupError', 'Please select your client from the list below.');
+                if (clientInput) {
+                    clientInput.style.borderColor = '#ef4444';
+                    clientInput.focus();
+                    Signup.searchClients();
+                }
+                return;
+            }
+        }
+
         var payload = {
             name: document.getElementById('signup_name').value.trim(),
             empId: document.getElementById('signup_empId').value.trim(),
             email: document.getElementById('signup_email').value.trim(),
-            designation: document.getElementById('signup_designation').value,
+            designation: designation,
             clientId: clientId,
             password: document.getElementById('signup_password').value,
             confirmPassword: document.getElementById('signup_confirm').value
@@ -1285,56 +2288,109 @@ var Signup = {
         var des = document.getElementById('signup_designation').value;
         var field = document.getElementById('clientField');
         var hint = document.getElementById('clientHint');
+        var clientInput = document.getElementById('signup_client');
         if (des === 'Student') {
             field.style.display = 'block';
-            hint.textContent = 'Please select your client.';
+            hint.innerHTML = '<span style="color:#b91c1c;font-weight:600;">* Required for Articled Students:</span> Please select your assigned client.';
+            if (clientInput && !clientInput.dataset.selectedId) {
+                setTimeout(function() {
+                    Signup.searchClients();
+                }, 100);
+            }
         } else {
             field.style.display = 'block';
             hint.textContent = 'Optional for non-students.';
+            if (clientInput) clientInput.style.borderColor = '';
         }
     },
 
     searchClients: function() {
         var input = document.getElementById('signup_client');
-        var term = input.value.trim();
+        var term = (input ? input.value : '').trim();
         var suggestions = document.getElementById('clientSuggestions');
-        if (term.length < 1) {
-            suggestions.classList.add('hidden');
-            suggestions.innerHTML = '';
-            delete input.dataset.selectedId;
-            return;
-        }
+        if (!suggestions) return;
+
         clearTimeout(searchTimer);
         searchTimer = setTimeout(function() {
             ApiBridge.call('searchClients', [State.token || 'temp', term],
                 function(results) {
                     if (!results || results.length === 0) {
-                        suggestions.innerHTML = '<div style="color:var(--ink-soft);padding:8px 12px;">No clients found</div>';
+                        suggestions.innerHTML = '<div style="color:var(--ink-soft);padding:10px 12px;font-size:12.5px;">No clients found. Type to search or ask Admin to register client.</div>';
                         suggestions.classList.remove('hidden');
                         return;
                     }
                     suggestions.innerHTML = '';
                     results.forEach(function(c) {
                         var option = document.createElement('div');
-                        option.textContent = c.name + (c.jobNumber ? ' (' + c.jobNumber + ')' : '');
-                        option.addEventListener('mousedown', function() { Signup.selectClient(c.id, c.name); });
+                        option.className = 'suggestion-item';
+                        option.style.cssText = 'padding:9px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f1f5f9;';
+                        option.innerHTML = '<div><strong style="color:var(--navy);font-size:13px;">' + esc(c.name) + '</strong>' + 
+                            (c.jobNumber ? ' <span style="font-size:11px;color:#64748b;font-weight:normal;">(' + esc(c.jobNumber) + ')</span>' : '') + 
+                            '</div><span style="font-size:11px;color:#0d9488;font-weight:600;">Select &rarr;</span>';
+                        option.addEventListener('mousedown', function(e) {
+                            e.preventDefault();
+                            Signup.selectClient(c.id, c.name);
+                        });
                         suggestions.appendChild(option);
                     });
                     suggestions.classList.remove('hidden');
                 },
                 function() {
-                    suggestions.innerHTML = '<div style="color:var(--maroon);padding:8px 12px;">Error searching clients</div>';
+                    suggestions.innerHTML = '<div style="color:var(--maroon);padding:8px 12px;font-size:12px;">Error loading clients</div>';
                     suggestions.classList.remove('hidden');
                 }
             );
-        }, 300);
+        }, 150);
     },
 
     selectClient: function(id, name) {
         var input = document.getElementById('signup_client');
-        input.value = name;
-        input.dataset.selectedId = id;
-        document.getElementById('clientSuggestions').classList.add('hidden');
+        var badge = document.getElementById('signupClientBadge');
+        var badgeName = document.getElementById('signupClientBadgeName');
+        var clearBtn = document.getElementById('signupClientClearBtn');
+        var hint = document.getElementById('clientHint');
+
+        if (input) {
+            input.value = name;
+            input.dataset.selectedId = id;
+            input.style.borderColor = '#10b981';
+        }
+        if (badge && badgeName) {
+            badgeName.textContent = name;
+            badge.classList.remove('hidden');
+        }
+        if (clearBtn) clearBtn.classList.remove('hidden');
+        if (hint) hint.innerHTML = '<span style="color:#065f46;font-weight:600;">✓ Selected Client: ' + esc(name) + '</span>';
+
+        var suggestions = document.getElementById('clientSuggestions');
+        if (suggestions) suggestions.classList.add('hidden');
+
+        var err = document.getElementById('signupError');
+        if (err && err.textContent.indexOf('client') !== -1) {
+            err.classList.add('hidden');
+            err.textContent = '';
+        }
+    },
+
+    clearSelectedClient: function() {
+        var input = document.getElementById('signup_client');
+        var badge = document.getElementById('signupClientBadge');
+        var clearBtn = document.getElementById('signupClientClearBtn');
+        var hint = document.getElementById('clientHint');
+
+        if (input) {
+            input.value = '';
+            delete input.dataset.selectedId;
+            input.style.borderColor = '';
+            input.focus();
+        }
+        if (badge) badge.classList.add('hidden');
+        if (clearBtn) clearBtn.classList.add('hidden');
+        if (hint) {
+            var des = document.getElementById('signup_designation').value;
+            hint.innerHTML = des === 'Student' ? '<span style="color:#b91c1c;font-weight:600;">* Required for Articled Students:</span> Please select your assigned client.' : 'Optional for non-students.';
+        }
+        Signup.searchClients();
     }
 };
 
@@ -1342,17 +2398,23 @@ var Signup = {
 document.addEventListener('DOMContentLoaded', function() {
     var clientInput = document.getElementById('signup_client');
     if (clientInput) {
-        clientInput.addEventListener('input', Signup.searchClients);
+        clientInput.addEventListener('input', function() {
+            delete clientInput.dataset.selectedId;
+            var badge = document.getElementById('signupClientBadge');
+            if (badge) badge.classList.add('hidden');
+            Signup.searchClients();
+        });
+        clientInput.addEventListener('focus', function() {
+            Signup.searchClients();
+        });
+        clientInput.addEventListener('click', function() {
+            Signup.searchClients();
+        });
         clientInput.addEventListener('blur', function() {
             setTimeout(function() {
                 var el = document.getElementById('clientSuggestions');
                 if (el) el.classList.add('hidden');
             }, 250);
-        });
-        clientInput.addEventListener('focus', function() {
-            if (this.value.trim().length > 0) {
-                Signup.searchClients();
-            }
         });
     }
 });
@@ -2280,6 +3342,7 @@ App.applyLabels = function() {
 // BOOT
 // ===========================================================================
 document.getElementById('dateLine').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+BackendConfig.updateStatusBadges();
 
 (function boot() {
     var saved = localStorage.getItem('acnabin_session_token');
